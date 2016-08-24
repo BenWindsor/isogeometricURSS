@@ -13,7 +13,7 @@ function val = nurbCurveEval( U, u, p, ctrl, W )
 
 %in nurbs book n=m-p-1 however there the knots run from 0,...,m but here
 %they run from 1,...,m so we need to use n=(m-1)-p-1
-n=numel(U)-1-p-1;
+n=numel(U)-p-1;
 
 numerator=zeros(numel(ctrl(:,1)), 1);
 denominator=weightFunction(U, u, p, W);

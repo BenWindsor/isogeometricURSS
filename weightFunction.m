@@ -5,7 +5,7 @@ function val = weightFunction( U, u, p, W )
 % p = degrree
 % W = weight vector
 
-n = numel(U)-1-p-1;
+n = numel(U)-p-1;
 val = 0;
 for i=1:n
     val = val + W(i)*basisSplineEval(U, u, i, p);
