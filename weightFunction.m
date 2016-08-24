@@ -5,6 +5,8 @@ function val = weightFunction( U, u, p, W )
 % p = degrree
 % W = weight vector
 
+% This function is the denominator in the NURBS basis functions
+
 n = numel(U)-p-1;
 val = 0;
 for i=1:n

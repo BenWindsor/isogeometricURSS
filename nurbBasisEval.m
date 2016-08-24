@@ -1,6 +1,11 @@
 function val = nurbBasisEval( U, u, i, p, W )
-%NURBBASISEVAL Summary of this function goes here
-%   Detailed explanation goes here
+% Returns value of nurbs basis function R_i,p(u) 
+% INPUTS
+% U=knot vector
+% u=eval point
+% i=the ith nurbs basis
+% p=degree
+% W=weight vector
 
 numerator=basisSplineEval(U,u,i,p)*W(i);
 denominator=weightFunction(U,u,p,W);
