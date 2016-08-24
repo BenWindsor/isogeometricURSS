@@ -7,11 +7,26 @@ function val = bernsteinEval( a, p, u )
 % denoted with p=0. The wikipedia uses p=0 but the Hughes paper named above
 % uses p=1 so I am using that convention for now as that is what they use
 % to implement their bezier extraction operator.
-if a==1 && p==1
+
+% NB: Both these definitions seem to differ from the wiki pictures
+
+%Note: implementation from bezier extraction paper
+% if a==1 && p==1
+%     val = 1;
+% elseif a<1 | a>p+1
+%     val = 0;
+% else
+%     val = (1-u)*bernsteinEval(a, p-1, u) + u*bernsteinEval(a-1, p-1, u);
+% end
+
+%Note: implementation from cahn-hilliard periodic nurbs Hughes paper
+if p==0
     val = 1;
-elseif a<1 | a>p+1
+elseif a<1 || a>p+1
     val = 0;
 else
     val = (1-u)*bernsteinEval(a, p-1, u) + u*bernsteinEval(a-1, p-1, u);
+end
+
 end
 
