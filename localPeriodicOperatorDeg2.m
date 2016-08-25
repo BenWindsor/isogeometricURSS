@@ -4,7 +4,8 @@ function operator = localPeriodicOperatorDeg2(U, i)
 % U=UNIFORM OPEN knot vector
 % i=element index e.g. working on [U(i), U(i+1)) knot span
 
-p=2; %degree
+%degree
+p=2; 
 
 %number accounts for repeated knots since is uniform open knot vector
 elemNum=numel(U)-2*p-1; 
