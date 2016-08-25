@@ -4,13 +4,11 @@ function vals = localBasisSplineVectorEval( U, u, i, p )
 % INPUT
 % U=UNIFORM OPEN knot vector
 % u=eval point
-% i=knot index for start of span NOTE: currently not used
+% i=knot index for start of span 
 % p=degree
 
 %NOTE: add error to handle if the point u isnt
 %in the interval [U(i),U(i+1))
-
-%NOTE: currently i is not used, should correct
 
 vals=zeros(p+1, 1);
 
