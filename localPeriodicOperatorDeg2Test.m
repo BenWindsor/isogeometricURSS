@@ -6,7 +6,7 @@ size=100;
 space=linspace(U(3), U(3+1), size);
 points=zeros(size, p+1);
 for j=1:numel(space)
-    points(j,:)=localBasisSplineVectorEval(U,space(j),3,p);
+    points(j,:)=localBasisSplineVectorEval(U,space(j),1,p);
 end
 hold on;
 for j=1:(p+1)
@@ -28,7 +28,7 @@ end
 space=linspace(U(4), U(4+1), size);
 points=zeros(size, p+1);
 for j=1:numel(space)
-    points(j,:)=localBasisSplineVectorEval(U,space(j),4,p);
+    points(j,:)=localBasisSplineVectorEval(U,space(j),2,p);
 end
 for j=1:(p+1)
     scatter(space, points(:,j));
@@ -38,7 +38,7 @@ end
 space=linspace(U(6), U(6+1), size);
 points=zeros(size, p+1);
 for j=1:numel(space)
-    points(j,:)=localBasisSplineVectorEval(U,space(j),6,p);
+    points(j,:)=localBasisSplineVectorEval(U,space(j),4,p);
 end
 for j=1:(p+1)
     scatter(space, points(:,j));
@@ -48,7 +48,7 @@ end
 space=linspace(U(7), U(7+1), size);
 points=zeros(size, p+1);
 for j=1:numel(space)
-    points(j,:)=localBasisSplineVectorEval(U,space(j),7,p);
+    points(j,:)=localBasisSplineVectorEval(U,space(j),5,p);
 end
 for j=1:(p+1)
     scatter(space, points(:,j));

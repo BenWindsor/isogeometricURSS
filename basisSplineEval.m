@@ -1,4 +1,4 @@
-function val = splineEval( U, u, i, p )
+function val = basisSplineEval( U, u, i, p )
 % Returns the value of the i'th degree p spline on the knot vector U at
 % point u
 % INPUT:

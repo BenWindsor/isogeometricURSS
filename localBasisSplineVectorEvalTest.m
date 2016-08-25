@@ -1,3 +1,4 @@
+%Plot some basis curves
 U=[0 0 0 0.2 0.4 0.6 0.8 1.0 1.0 1.0];
 p=2;
 i=3;
@@ -6,5 +7,16 @@ for j=1:7
     fplot(@(x)(basisSplineEval(U,x,j,p)),[0, 0.999]);
 end
 
+%Plot the points vector at a specific value and make sure they land on the
+%curves
 point=0.1;
-scatter(point*ones(p+1,1), localBasisSplineVectorEval(U, point, 1, p));
+elem=1;
+scatter(point*ones(p+1,1), localBasisSplineVectorEval(U, point, elem, p));
+
+point=0.45;
+elem=3;
+scatter(point*ones(p+1,1), localBasisSplineVectorEval(U, point, elem, p));
+
+point=0.9;
+elem=5;
+scatter(point*ones(p+1,1), localBasisSplineVectorEval(U, point, elem, p));
