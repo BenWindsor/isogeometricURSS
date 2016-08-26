@@ -8,5 +8,7 @@ p=2;
 
 hold on;
 
+%plot the basis function in question
 fplot(@(x)(periodicBasisEval(U, x, elem, p)), [0 0.999]);
+%plot the derivative tangent line to the point chosen above as u
 fplot(@(x)(deriv*(x-u)+evalPoint), [0, 0.999]);
