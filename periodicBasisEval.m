@@ -7,6 +7,10 @@ function val = periodicBasisEval( U, u, elem, p )
 % elem=element which periodic spline eminates from
 % p = degrree
 
+%IMPLEMENT: attempting to evaluate at last point on knot will return the
+%value at first point of knot as it is periodic, allowing evaluation at
+%e.g. 1 on a knot span [0 1] 
+
 % Which element u lies in
 evalElem=findSpan(U,u)-p;
 % Total elements
@@ -35,7 +39,6 @@ if p==2
                 newVals=operator*normalVals;
                 val=newVals(1);
             else
-                fprintf('here\n');
                 normalVals=localBasisSplineVectorEval(U, u, elem, p);
                 operator=localPeriodicOperator(U, u, p, elem);
                 newVals=operator*normalVals;
