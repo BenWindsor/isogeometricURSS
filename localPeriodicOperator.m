@@ -1,10 +1,10 @@
-function operator = localPeriodicOperator( U, u, p, i )
+function operator = localPeriodicOperator( U, u, p, elem )
 % Return local operator that transforms a b-spline into a periodic spline
 % INPUT
 % U=UNIFORM OPEN knot vector
 % u=eval point or knot?? not sure yet
 % p=degree
-% i=element index e.g. [U(i), U(i+1)) interval
+% elem=element index 
 
 
 %Accounts for repeated knots since open vector
@@ -14,9 +14,9 @@ elemNum=numel(U)-2*p-1;
 
 %TEMPORARY IMPLEMENTATION
 if p==2
-    operator=localPeriodicOperatorDeg2(U, i);
+    operator=localPeriodicOperatorDeg2(U, elem);
 elseif p==3
-    operator=localPeriodicOperatorDeg3(U, i);
+    operator=localPeriodicOperatorDeg3(U, elem);
 end
 
 %FULL IMPLEMENTATION
