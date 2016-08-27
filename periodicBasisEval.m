@@ -57,7 +57,6 @@ if p==2
                 newVals=operator*normalVals;
                 val=newVals(1);
             else
-                fprintf('here\n');
                 normalVals=localBasisSplineVectorEval(U, u, elem, p);
                 operator=localPeriodicOperator(U, u, p, elem);
                 newVals=operator*normalVals;

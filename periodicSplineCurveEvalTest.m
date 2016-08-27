@@ -11,3 +11,5 @@ U=[0 0 0 0.2 0.4 0.6 0.8 1 1 1];
 ctrl=[1 2 3 4 -3];
 p=2;
 fplot(@(x)(periodicSplineCurveEval(U,x,p,ctrl)), [0, 0.999]);
+crv=perbspmak(ctrl, U);
+perbspplot(crv,100);
