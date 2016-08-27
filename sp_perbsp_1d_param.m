@@ -57,7 +57,7 @@ tders = perbspfunder(knots, nodes, p, nders);
 %nbf   = numbasisfun (s(:)', nodes(:)', p, knots); %ALTER to use numperbasisfun.m
 nbf = numperbsp(knots, nodes(:)', p);
 %nbf   = reshape (nbf+1, size(s,1), size(s,2), p+1);
-nbf = reshape(nbf, size(s,q), size(s,2), p+1);
+nbf = reshape(nbf, size(s,1), size(s,2), p+1);
 
 ders = zeros (numel(nodes), nders+1, nsh_max);
 for inqn = 1:numel(nodes)
@@ -73,6 +73,7 @@ end
 
 shape_functions = reshape (ders(:, 1, :), nqn, nel, []);
 shape_functions = permute (shape_functions, [1, 3, 2]);
+
 
 sp = struct ('nsh_max', nsh_max, 'nsh', nsh, 'ndof', ndof,  ...
              'connectivity', connectivity, ...

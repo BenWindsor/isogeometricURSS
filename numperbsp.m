@@ -18,7 +18,7 @@ for i=1:numel(u)
         elem=span-p;
     end
     
-    fprintf(num2str(elem));
+    
     for j=1:(p+1)
         B(i,j)=periodicElemCalc(U,p,elem,-(j-1));
     end

@@ -9,6 +9,11 @@ function val = periodicSplineCurveEval( U, u, p, ctrl )
 %  y1 y2 y3 y4] etc.
 % so each column is a coordinate point
 
+%convert cell of points to normal array
+if iscell(u)
+    u=cell2mat(u);
+end
+
 val=zeros(numel(ctrl(:,1)), numel(u));
 elems=numel(U)-2*p-1;
 for i=1:numel(u)
