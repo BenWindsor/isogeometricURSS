@@ -11,6 +11,8 @@ if (~isempty (varargin))
   for ii=1:2:length(varargin)-1
     if (strcmpi (varargin {ii}, 'gradient'))
       gradient = varargin {ii+1};
+    elseif (strcmpi (varargin {ii}, 'hessian'))
+      hessian = varargin {ii+1};
     else 
       error ('sp_bspline_1d_param: unknown option %s', varargin {ii});
     end
@@ -18,7 +20,9 @@ if (~isempty (varargin))
 end
 
 %Assign number of derivatives, nders, depending on options given. 
-if(gradient)
+if (hessian)
+  nders=2;
+elseif(gradient)
   nders=1;
 else
   nders=0;
@@ -52,19 +56,66 @@ nsh_max = max (nsh);
 
 % s = findspan(mcp, p, nodes, knots);
 s = findSpan(knots, nodes);
-%tders = basisfunder (s, p, nodes, knots, nders); %ALTER to use periodic derivative
+%tders = basisfunder (s, p, nodes, knots, nders); 
 tders = perbspfunder(knots, nodes, p, nders);
-%nbf   = numbasisfun (s(:)', nodes(:)', p, knots); %ALTER to use numperbasisfun.m
+%nbf   = numbasisfun (s(:)', nodes(:)', p, knots); 
 nbf = numperbsp(knots, nodes(:)', p);
 %nbf   = reshape (nbf+1, size(s,1), size(s,2), p+1);
 nbf = reshape(nbf, size(s,1), size(s,2), p+1);
 
+
 ders = zeros (numel(nodes), nders+1, nsh_max);
+%DEBUG  --------------------------------------------------------
+fprintf('sp_perbsp_1d_param.m debug line 65\n');
+fprintf('\n');
+fprintf('size(ders) before: ');
+fprintf(mat2str(size(ders)));
+fprintf('\n');
+%END DEBUG------------------------------------------------------
+
 for inqn = 1:numel(nodes)
   [ir,iel] = ind2sub (size(nodes),inqn);
-  ind = find (connectivity(:,iel) == nbf(ir,iel,1)); 
+  %TEST FIX for resize changing nunber of elements bug
+  %ind = find (connectivity(:,iel) == nbf(ir,iel,1)); 
+  ind=1;
+  %END TEST FIX
   ders(inqn,:,ind:ind+p) = tders(inqn,:,:);
+    %DEBUG  --------------------------------------------------------
+    fprintf('\n');
+    fprintf('size(ders) during loop: ');
+    fprintf(mat2str(size(ders)));
+    fprintf('\n');
+    fprintf('ind: ');
+    fprintf(mat2str(ind));
+    fprintf('\n');
+    %END DEBUG------------------------------------------------------
 end
+
+% DEBUG ---------------------------------------------------------
+fprintf('sp_perbsp_1d_param.m debug line 84\n');
+fprintf('tders: ');
+fprintf(mat2str(tders(:,:,1)));
+% fprintf('nbf: ');
+% fprintf(mat2str(nbf));
+fprintf('numel(nodes): ');
+fprintf(num2str(numel(nodes)));
+fprintf('\n');
+fprintf('nders+1: ');
+fprintf(num2str(nders+1));
+fprintf('\n');
+fprintf('nsh_max: ');
+fprintf(num2str(nsh_max));
+fprintf('\n');
+fprintf('ders(:,:,1): ');
+fprintf(mat2str(ders(:,:,1)));
+fprintf('\n');
+fprintf('size(ders) after: ');
+fprintf(mat2str(size(ders)));
+fprintf('\n');
+fprintf('nsh: ');
+fprintf(mat2str(nsh));
+fprintf('\n');
+% END DEBUG --------------------------------------------------------
 
 supp = cell (ndof, 1);
 for ii = 1:ndof
@@ -81,12 +132,23 @@ sp = struct ('nsh_max', nsh_max, 'nsh', nsh, 'ndof', ndof,  ...
              'ncomp', 1, 'degree', degree, 'knots', knots);
 sp.supp = supp;
 
+%DEBUG-------------------------------------------------------
+fprintf('shape_functions(:,:,1): ');
+fprintf(mat2str(shape_functions(:,:,1)));
+fprintf('\n');
+%END DEBUG -----------------------------------------------------
+
 if (gradient)
   shape_function_gradients = reshape (ders(:, 2, :), nqn, nel, []);
   shape_function_gradients = permute (shape_function_gradients, [1, 3, 2]);
   sp.('shape_function_gradients') = shape_function_gradients;
 end
 
+if (hessian)
+  shape_function_hessians = reshape (ders(:, 3, :), nqn, nel, []);
+  shape_function_hessians = permute (shape_function_hessians, [1, 3, 2]);
+  sp.('shape_function_hessians') = shape_function_hessians;
+end
 
 end
 

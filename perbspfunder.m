@@ -9,7 +9,7 @@ function dersv = perbspfunder( U, u, p, nders )
 
 dersv = zeros(numel(u), nders+1, p+1);
 
-% Iterate through elements
+% Iterate through eval points
 for j=1:numel(u)
     % Find the non-zero periodic basis funs at u
     nonZeroBasis=numperbsp(U,u(j),p); 
@@ -21,6 +21,8 @@ for j=1:numel(u)
                 dersv(j,l,k)=periodicBasisEval(U,u(j),nonZeroBasis(k),p);
             elseif l==2
                 dersv(j,l,k)=periodicSingleBasisDerivEval(U,u(j),nonZeroBasis(k),p);
+            else
+                dersv(j,l,k)=0;
             end
         end
     end

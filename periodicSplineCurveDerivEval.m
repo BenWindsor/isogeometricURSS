@@ -15,6 +15,11 @@ if p~=2
     error('Can only handle degree 2');
 end
 
+%If u is a cell convert to matrix
+if iscell(u)
+    u=cell2mat(u);
+end
+
 val=zeros(numel(ctrl(:,1)), numel(u));
 elems=numel(U)-2*p-1;
 for i=1:numel(u)
