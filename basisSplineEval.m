@@ -7,9 +7,15 @@ function val = basisSplineEval( U, u, i, p )
 % i = ith B-spline
 % p = degrree
 
-if p==0
-    val = zeroDegreeEval(U, u, i);
-else 
-    val = firstCoeff(U, u, i, p)*basisSplineEval(U, u, i, p-1) + secondCoeff(U, u, i, p)*basisSplineEval(U, u, i+1, p-1);
+val=zeros(numel(u),1);
+
+for j=1:numel(u)
+    if p==0
+        val(j) = zeroDegreeEval(U, u(j), i);
+    else
+        val(j) = firstCoeff(U, u(j), i, p)*basisSplineEval(U, u(j), i, p-1) + secondCoeff(U, u(j), i, p)*basisSplineEval(U, u(j), i+1, p-1);
+    end
+end
+
 end
     
