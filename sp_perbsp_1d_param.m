@@ -45,10 +45,21 @@ for iel=1:nel
   %s = findspan(mcp, p, nodes(:, iel)', knots);
   s = findSpan(knots,nodes(:,iel)'); 
   %c = numbasisfun(s, nodes(:, iel)', p, knots); %WRITE numperbasisfun.m
-  c = numperbsp(knots, nodes(:,iel)', p);
+%   c = numperbsp(knots, nodes(:,iel)', p);
   %c = unique(c(:))+1; % QUESTION: do I remove the +1 here?? as we are now counting from 0 anyway?
-  c = unique(c(:));
-  connectivity(1:numel(c), iel) = c;
+%   c = unique(c(:));
+
+  %Altered to make correct connectivity array by hand
+  if iel==1
+      connectivity(1:3, iel) = [nel-1 nel 1];
+  else
+      if iel==2
+          connectivity(1:3, iel) = [nel 1 2];
+      else
+          connectivity(1:3, iel) = [iel-2 iel-1 iel];
+      end
+  end
+%  connectivity(1:numel(c), iel) = c;
   nsh(iel) = nnz (connectivity(:,iel));
 end
 
@@ -66,11 +77,11 @@ nbf = reshape(nbf, size(s,1), size(s,2), p+1);
 
 ders = zeros (numel(nodes), nders+1, nsh_max);
 %DEBUG  --------------------------------------------------------
-fprintf('sp_perbsp_1d_param.m debug line 65\n');
-fprintf('\n');
-fprintf('size(ders) before: ');
-fprintf(mat2str(size(ders)));
-fprintf('\n');
+% fprintf('sp_perbsp_1d_param.m debug line 65\n');
+% fprintf('\n');
+% fprintf('size(ders) before: ');
+% fprintf(mat2str(size(ders)));
+% fprintf('\n');
 %END DEBUG------------------------------------------------------
 
 for inqn = 1:numel(nodes)
@@ -81,40 +92,40 @@ for inqn = 1:numel(nodes)
   %END TEST FIX
   ders(inqn,:,ind:ind+p) = tders(inqn,:,:);
     %DEBUG  --------------------------------------------------------
-    fprintf('\n');
-    fprintf('size(ders) during loop: ');
-    fprintf(mat2str(size(ders)));
-    fprintf('\n');
-    fprintf('ind: ');
-    fprintf(mat2str(ind));
-    fprintf('\n');
+%     fprintf('\n');
+%     fprintf('size(ders) during loop: ');
+%     fprintf(mat2str(size(ders)));
+%     fprintf('\n');
+%     fprintf('ind: ');
+%     fprintf(mat2str(ind));
+%     fprintf('\n');
     %END DEBUG------------------------------------------------------
 end
 
 % DEBUG ---------------------------------------------------------
-fprintf('sp_perbsp_1d_param.m debug line 84\n');
-fprintf('tders: ');
-fprintf(mat2str(tders(:,:,1)));
-% fprintf('nbf: ');
-% fprintf(mat2str(nbf));
-fprintf('numel(nodes): ');
-fprintf(num2str(numel(nodes)));
-fprintf('\n');
-fprintf('nders+1: ');
-fprintf(num2str(nders+1));
-fprintf('\n');
-fprintf('nsh_max: ');
-fprintf(num2str(nsh_max));
-fprintf('\n');
-fprintf('ders(:,:,1): ');
-fprintf(mat2str(ders(:,:,1)));
-fprintf('\n');
-fprintf('size(ders) after: ');
-fprintf(mat2str(size(ders)));
-fprintf('\n');
-fprintf('nsh: ');
-fprintf(mat2str(nsh));
-fprintf('\n');
+% fprintf('sp_perbsp_1d_param.m debug line 84\n');
+% fprintf('tders: ');
+% fprintf(mat2str(tders(:,:,1)));
+% % fprintf('nbf: ');
+% % fprintf(mat2str(nbf));
+% fprintf('numel(nodes): ');
+% fprintf(num2str(numel(nodes)));
+% fprintf('\n');
+% fprintf('nders+1: ');
+% fprintf(num2str(nders+1));
+% fprintf('\n');
+% fprintf('nsh_max: ');
+% fprintf(num2str(nsh_max));
+% fprintf('\n');
+% fprintf('ders(:,:,1): ');
+% fprintf(mat2str(ders(:,:,1)));
+% fprintf('\n');
+% fprintf('size(ders) after: ');
+% fprintf(mat2str(size(ders)));
+% fprintf('\n');
+% fprintf('nsh: ');
+% fprintf(mat2str(nsh));
+% fprintf('\n');
 % END DEBUG --------------------------------------------------------
 
 supp = cell (ndof, 1);
@@ -133,9 +144,9 @@ sp = struct ('nsh_max', nsh_max, 'nsh', nsh, 'ndof', ndof,  ...
 sp.supp = supp;
 
 %DEBUG-------------------------------------------------------
-fprintf('shape_functions(:,:,1): ');
-fprintf(mat2str(shape_functions(:,:,1)));
-fprintf('\n');
+% fprintf('shape_functions(:,:,1): ');
+% fprintf(mat2str(shape_functions(:,:,1)));
+% fprintf('\n');
 %END DEBUG -----------------------------------------------------
 
 if (gradient)

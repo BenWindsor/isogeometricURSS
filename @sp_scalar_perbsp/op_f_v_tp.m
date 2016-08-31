@@ -40,6 +40,8 @@ function rhs = op_f_v_tp (space, msh, coeff)
     end
 
     rhs = rhs + op_f_v (sp_col, msh_col, coeff (x{:}));
+    fprintf('debug in op_f_v_tp.m\n');
+    disp(op_f_v (sp_col, msh_col, coeff (x{:})));
   end
 
 end

@@ -11,6 +11,12 @@ function perbsp = periodicCurveInterpolate( elemNum, p, varargin )
 %N.B. Doesnt seem to do well with 1D curves, check
 %periodicCurveInterpolateTest.m to see this in the commented out functions
 
+%Account for the fact that even elements wont work past 20:
+if (mod(elemNum,2)==0 && elemNum>19)
+    error('please use an odd number of elements to avoid singular matrices');
+end
+
+%Deal with different inputs
 if(numel(varargin)==1)
     xHandle=varargin{1};   
 elseif(numel(varargin)==2)
