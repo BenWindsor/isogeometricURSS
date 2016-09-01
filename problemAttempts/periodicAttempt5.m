@@ -1,20 +1,23 @@
 U=[0         0         0    0.0526    0.1053    0.1579    0.2105    0.2632    0.3158    0.3684    0.4211    0.4737    0.5263 0.5789    0.6316    0.6842    0.7368    0.7895    0.8421    0.8947    0.9474    1.0000    1.0000    1.0000];
 ctrl=[0.8916    0.6866    0.4072    0.0837   -0.2489   -0.5545   -0.8001   -0.9589   -1.0138   -0.9589   -0.8001   -0.5545   -0.2489   0.0837    0.4072    0.6866    0.8916    1.0000    1.0000;
     0.4825    0.7459    0.9284    1.0104    0.9828    0.8487    0.6227    0.3292    0.0000   -0.3292   -0.6227   -0.8487   -0.9828 -1.0104   -0.9284   -0.7459   -0.4825   -0.1669    0.1669];
-crv=perbspmak(ctrl, U);
+crv=periodicCurveInterpolate(23,2,@(x)(cos(2*pi*x)), @(y)(sin(2*pi*y)));
+%crv=perbspmak(ctrl, U);
 perbspplot(crv,100);
 hold on;
 crv2=nrbcirc(1);
 nrbplot(crv2,100);
 
-numElems=numel(U)-2*(crv.order-1)-1;
+
 
 figure;
 
 geometry=geo_load(crv);
 knots=geometry.perbspline.knots;
-[qn qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(crv.order));
+[qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(crv.order));
 msh=msh_cartesian(knots, qn, qw, geometry);
+
+numElems=numel(knots)-2*(crv.order-1)-1;
 
 space=sp_perbsp(crv, msh);
 
@@ -38,7 +41,7 @@ rhs=rhs(1:numElems);
 %calculate results
 results=mat\rhs;
 
-field=perbspmak(results',U);
+field=perbspmak(results',knots);
 perbspplot(field,10);
 
 %Plot actual result

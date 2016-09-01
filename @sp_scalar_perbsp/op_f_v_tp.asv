@@ -32,7 +32,6 @@ function rhs = op_f_v_tp (space, msh, coeff)
   rhs = zeros (space.ndof, 1);
   
   flag=1;
-  offset=0;
 
   for iel = 1:msh.nel_dir(1)
     msh_col = msh_evaluate_col (msh, iel);
@@ -42,29 +41,9 @@ function rhs = op_f_v_tp (space, msh, coeff)
       x{idim} = reshape (msh_col.geo_map(idim,:,:), msh_col.nqn, msh_col.nel);
     end
     
-    % OLD VERSION
     rhs = rhs + op_f_v (sp_col, msh_col, coeff (x{:}));
-    % NEW VERSION
-    % Find first time entries are non-zero and start recording
-    
-%     nextVal = op_f_v (sp_col, msh_col, coeff (x{:}));
-%     
-%     if any(nextVal)==1
-%         nextVal=shiftArray(nextVal, offset);
-%         rhs=rhs+nextVal;
-%         offset=offset+1;
-%     else
-%         rhs=rhs+nextVal;
-%     end
-    fprintf('before x print\n');
-    x{:}
-    coeff (x{:})
-    fprintf('after x print\n');
-    fprintf('debug in op_f_v_tp.m\n')
-    %disp(x{:});
+    fprintf('debug in op_f_v_tp.m\n');
     disp(op_f_v (sp_col, msh_col, coeff (x{:})));
-    fprintf('\n');
-    
   end
 
 end

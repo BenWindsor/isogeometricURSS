@@ -3,7 +3,7 @@
 %ctrl=[0.8916    0.6866    0.4072    0.0837   -0.2489   -0.5545   -0.8001   -0.9589   -1.0138   -0.9589   -0.8001   -0.5545   -0.2489   0.0837    0.4072    0.6866    0.8916    1.0000    1.0000;
  %   0.4825    0.7459    0.9284    1.0104    0.9828    0.8487    0.6227    0.3292    0.0000   -0.3292   -0.6227   -0.8487   -0.9828 -1.0104   -0.9284   -0.7459   -0.4825   -0.1669    0.1669];
 %crv=perbspmak(ctrl, U);
-crv=periodicCurveInterpolate(19, 2, @(t)(cos(2*pi*t)), @(t)(sin(2*pi*t)));
+crv=periodicCurveInterpolate(13, 2, @(t)(cos(2*pi*t)), @(t)(sin(2*pi*t)));
 perbspplot(crv,100);
 hold on;
 crv2=nrbcirc(1);
@@ -33,7 +33,7 @@ mat=mat(1:numElems, 1:numElems);
 
 basisFun=4;
 c_0=zeros(sqrt(numel(M)),1); %initialise C_0 first value all ones
-S=op_f_v_tp(space, msh, @(x,y)(periodicBasisEval(U,inverseCircle(x,y),basisFun,2)) ); %wont allow constant source?
+S=op_f_v_tp(space, msh, @(x,y)(periodicBasisEval(knots,inverseCircle(x,y),basisFun,2)) ); %wont allow constant source?
 rhs=(1/delta)*M*c_0+S;
 
 %As only numElems non-zero elems cut off remaining two elements.
@@ -46,4 +46,4 @@ field=perbspmak(results',knots);
 perbspplot(field,10);
 
 %Plot actual result
-fplot(@(x)(periodicBasisEval(U,x,basisFun,2)), [0 1]);
+fplot(@(x)(periodicBasisEval(knots,x,basisFun,2)), [0 1]);
