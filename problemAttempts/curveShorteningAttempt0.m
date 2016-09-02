@@ -6,7 +6,7 @@
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
 degree=2;
-elemNum=19;
+elemNum=29;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -21,6 +21,7 @@ msh=msh_cartesian(knots, qn, qw, geometry);
 space=sp_perbsp(geometry.perbspline, msh);
 
 % Assemble LHS
+delta=0.05;
 D=1; 
 M = op_u_v_tp(space, space, msh); %mu = 1
 A = D*op_gradu_gradv_tp(space, space, msh); %epsilon = 1
@@ -37,7 +38,7 @@ curveC_0=periodicCurveInterpolate(elemNum, 2, @(x)(sin(6*pi*x)));
 c_0=curveC_0.coefs';
 t=0;
 % Provide source function for solution field on reference domain \hat{c}=tcos(8pix)+(1-t)sin(6pix)
-f=@(x,y)((1+16*t)*cos(8*pi*inverseCircle(x,y))+(8-9*t)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
+f=@(x,y)((1+16*(t+1)*delta)*cos(8*pi*inverseCircle(x,y))+(8-9*(t+1)*delta)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
 S=op_f_v_tp(space, msh, f ); 
 S=S(1:elemNum);
 rhs=(1/delta)*M*c_0+S;
@@ -52,11 +53,11 @@ results=mat\rhs;
 field=perbspmak(transpose(results), knots); %results needs to be a row so transpose
 
 %sample some points and plot
-perbspplot(field,100);
+perbspplot(field,1);
 hold on;
 
 %plot expected result as comparison
-fplot(@(x)((delta*0)*cos(8*pi*x)+(1-(delta*0))*sin(6*pi*x)), [0 1])
+fplot(@(x)((delta*1)*cos(8*pi*x)+(1-(delta*1))*sin(6*pi*x)), [0 1])
 
 %calculate and plot error too
 %error=actualPoints-points(1,:);

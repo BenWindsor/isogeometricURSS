@@ -6,7 +6,7 @@
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
 degree=2;
-elemNum=39;
+elemNum=29;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -42,11 +42,10 @@ curveC_0=periodicCurveInterpolate(elemNum, 2, @(x)(sin(6*pi*x)));
 c_0=curveC_0.coefs';
 t=0;
 % Provide source function for solution field on reference domain \hat{c}=tcos(8pix)+(1-t)sin(6pix)
-f=@(x,y)((1+16*t)*cos(8*pi*inverseCircle(x,y))+(8-9*t)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
+f=@(x,y)((1+16*(t+1)*delta)*cos(8*pi*inverseCircle(x,y))+(8-9*(t+1)*delta)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
 S=op_f_v_tp(space, msh, f ); 
 S=S(1:elemNum);
 rhs=(1/delta)*M*c_0+S;
-
 
 % resize rhs
 rhs=rhs(1:elemNum);
@@ -62,7 +61,7 @@ results=zeros(numel(rhs),stepNumber);
 prevResults=initialResults;
 for step=1:stepNumber
     % update rhs
-    t=delta*step;
+    t=delta*(step+1);
     f=@(x,y)((1+16*t)*cos(8*pi*inverseCircle(x,y))+(8-9*t)*sin(6*pi*inverseCircle(x,y)));
     S=op_f_v_tp(space, msh, f );
     
@@ -95,14 +94,13 @@ title('Approximated soltuions');
 for i=1:stepNumber
     perbspplot(perbspmak(results(:,i)', knots), 1);
 end
-
 figure;
 
 % Print some sample solutions
 hold on;
 title('actual solutions');
 %Inital solution for t=0;
-fplot(@(x)((delta*0)*cos(8*pi*x)+(1-(delta*0))*sin(6*pi*x)), [0 1])
-for i=1:5
+%fplot(@(x)((delta*0)*cos(8*pi*x)+(1-(delta*0))*sin(6*pi*x)), [0 1])
+for i=1:(stepNumber+1)
     fplot(@(x)((delta*i)*cos(8*pi*x)+(1-(delta*i))*sin(6*pi*x)), [0 1]);
 end
