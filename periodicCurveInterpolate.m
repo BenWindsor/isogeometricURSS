@@ -12,9 +12,9 @@ function perbsp = periodicCurveInterpolate( elemNum, p, varargin )
 %periodicCurveInterpolateTest.m to see this in the commented out functions
 
 %Account for the fact that even elements wont work past 20:
-if (mod(elemNum,2)==0 && elemNum>19)
-    error('please use an odd number of elements to avoid singular matrices');
-end
+% if (mod(elemNum,2)==0 && elemNum>19)
+%     error('please use an odd number of elements to avoid singular matrices');
+% end
 
 %Deal with different inputs
 if(numel(varargin)==1)
@@ -26,9 +26,9 @@ else
     error('please give 1 or 2 function handles');
 end
 
-if(p~=2)
-    error('Can only handle degree 2 at the moment');
-end
+% if(p~=2)
+%     error('Can only handle degree 2 at the moment');
+% end
 
 U=zeros(elemNum,1);
 startZeros=zeros(p+1,1);
@@ -49,7 +49,7 @@ if(numel(varargin)==1)
     xMatrix=zeros(elemNum, elemNum);
     for i=1:elemNum
         for j=1:elemNum
-            xMatrix(i, j)=periodicBasisEval(U, (i-1)/elemNum, j, 2);
+            xMatrix(i, j)=periodicBasisEval(U, (i-1)/elemNum, j, p);
         end
     end
     
@@ -71,8 +71,8 @@ elseif (numel(varargin)==2)
     yMatrix=zeros(elemNum, elemNum);
     for i=1:elemNum
         for j=1:elemNum
-            xMatrix(i, j)=periodicBasisEval(U, (i-1)/elemNum, j, 2);
-            yMatrix(i, j)=periodicBasisEval(U, (i-1)/elemNum, j, 2);
+            xMatrix(i, j)=periodicBasisEval(U, (i-1)/elemNum, j, p);
+            yMatrix(i, j)=periodicBasisEval(U, (i-1)/elemNum, j, p);
         end
     end
     

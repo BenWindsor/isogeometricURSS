@@ -7,20 +7,20 @@ function operator = localPeriodicOperator( U, u, p, elem )
 % elem=element index 
 
 
-%Accounts for repeated knots since open vector
-elemNum=numel(U)-2*p-1; 
 
 
 
-%TEMPORARY IMPLEMENTATION
+% TEMPORARY IMPLEMENTATION
 if p==2
     operator=localPeriodicOperatorDeg2(U, elem);
 elseif p==3
     operator=localPeriodicOperatorDeg3(U, elem);
 end
 
-%FULL IMPLEMENTATION
-%operator=zeros(p+1, p+1);
+% FULL IMPLEMENTATION
+% Accounts for repeated knots since open vector
+% elemNum=numel(U)-2*p-1; 
+% operator=zeros(p+1, p+1);
 % if i<=(p-1)
 %     operator(p+1, p+1)=1;
 %     for row=1:p

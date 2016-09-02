@@ -2,7 +2,7 @@ function operator = localPeriodicOperatorDeg3(U, i)
 % Returns the periodic operator on element i
 % INPUT
 % U=UNIFORM OPEN knot vector
-% i=element index e.g. working on [U(i), U(i+1)) knot span
+% i=element index
 
 p=3; %degree
 

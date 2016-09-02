@@ -1,4 +1,4 @@
-%Circle
+%Circle with degree 2 approx
 xHandle=@(t)(cos(2*pi*t));
 yHandle=@(t)(sin(2*pi*t));
 
@@ -20,6 +20,15 @@ perbspplot(crv, 300);
 % perbspplot(crv, 100);
 
 % figure
-% xHandle=@(t)(cos(pi*t));
-% crv=periodicCurveInterpolate(20, 2, xHandle);
+% xHandle=@(t)(sin(pi*t));
+% crv=periodicCurveInterpolate(21, 2, xHandle);
 % perbspplot(crv, 100);
+
+%Circle with degree 3 approx
+figure
+xHandle=@(t)(cos(2*pi*t));
+yHandle=@(t)(sin(2*pi*t));
+
+crv=periodicCurveInterpolate(5, 3, xHandle, yHandle);
+perbspplot(crv, 100);
+

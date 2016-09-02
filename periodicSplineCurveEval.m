@@ -15,7 +15,7 @@ if iscell(u)
 end
 
 val=zeros(numel(ctrl(:,1)), numel(u));
-elems=numel(U)-2*p-1;
+elems=numel(U)-(2*p)-1;
 for i=1:numel(u)
     for j=1:elems
         val(:,i) = val(:,i) + ctrl(:,j)*periodicBasisEval(U, u(i), j, p);

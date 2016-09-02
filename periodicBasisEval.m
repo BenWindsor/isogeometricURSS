@@ -73,8 +73,88 @@ for j=1:numel(u)
                 end
             end
         end
+    elseif p==3
+           % Case of no periodicity to account for
+        if elem<=(elemNum-p)
+            normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
+            operator=localPeriodicOperator(U, u(j), p, elem);
+            newVals=operator*normalVals;
+            val(j)=newVals(4);
+            % Case where 'end' functions overflow to 'beginning'
+        else
+            %The function overflowing into element 1
+            if elem==(elemNum-2)
+                if (elem+1)==evalElem
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(3);
+                elseif (elem+2)==evalElem
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(2);
+                elseif evalElem==1
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(1);
+                else
+                    normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
+                    operator=localPeriodicOperator(U, u(j), p, elem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(4);
+                end
+            %The function overflowing into element 1 and 2
+            elseif elem==(elemNum-1)
+                if (elem+1)==evalElem
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(3);
+                elseif evalElem==1
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(2);
+                elseif evalElem==2
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(1);
+                else
+                    normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
+                    operator=localPeriodicOperator(U, u(j), p, elem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(4);
+                end
+                %The function overflowing into element 1 and 2
+            elseif elem==(elemNum)
+                if evalElem==1
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(3);
+                elseif evalElem==2
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(2);
+                elseif evalElem==3
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(1);
+                else
+                    normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
+                    operator=localPeriodicOperator(U, u(j), p, elem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(4);
+                end
+            end
+        end
     else
-        error('only available for degree p=2');
+        error('only available for degree p=2 or p=3');
     end
 end
 end

@@ -11,9 +11,9 @@ U=perbsp.knots;
 p=perbsp.order-1;
 ctrl=perbsp.coefs;
 
-if p~=2
-    error('Can only handle degree 2');
-end
+% if p~=2
+%     error('Can only handle degree 2');
+% end
 
 %If u is a cell convert to matrix
 if iscell(u)

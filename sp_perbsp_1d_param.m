@@ -42,25 +42,39 @@ nqn = size (nodes, 1);
 nsh = zeros (1, nel);
 connectivity = zeros (p+1, nel);
 for iel=1:nel
-  %s = findspan(mcp, p, nodes(:, iel)', knots);
-  s = findSpan(knots,nodes(:,iel)'); 
-  %c = numbasisfun(s, nodes(:, iel)', p, knots); %WRITE numperbasisfun.m
-%   c = numperbsp(knots, nodes(:,iel)', p);
-  %c = unique(c(:))+1; % QUESTION: do I remove the +1 here?? as we are now counting from 0 anyway?
-%   c = unique(c(:));
-
-  %Altered to make correct connectivity array by hand
-  if iel==1
-      connectivity(1:3, iel) = [nel-1 nel 1];
-  else
-      if iel==2
-          connectivity(1:3, iel) = [nel 1 2];
-      else
-          connectivity(1:3, iel) = [iel-2 iel-1 iel];
-      end
-  end
-%  connectivity(1:numel(c), iel) = c;
-  nsh(iel) = nnz (connectivity(:,iel));
+    %s = findspan(mcp, p, nodes(:, iel)', knots);
+    s = findSpan(knots,nodes(:,iel)');
+    %c = numbasisfun(s, nodes(:, iel)', p, knots); %WRITE numperbasisfun.m
+    %   c = numperbsp(knots, nodes(:,iel)', p);
+    %c = unique(c(:))+1; % QUESTION: do I remove the +1 here?? as we are now counting from 0 anyway?
+    %   c = unique(c(:));
+    
+    if p==2
+        %Altered to make correct connectivity array by hand
+        if iel==1
+            connectivity(1:3, iel) = [nel-1 nel 1];
+        else
+            if iel==2
+                connectivity(1:3, iel) = [nel 1 2];
+            else
+                connectivity(1:3, iel) = [iel-2 iel-1 iel];
+            end
+        end
+    elseif p==3
+        if iel==1
+            connectivity(1:4, iel) = [nel-2 nel-1 nel 1];
+        else
+            if iel==2
+                connectivity(1:4, iel) = [nel-1 nel 1 2];
+            elseif iel==3
+                connectivity(1:4, iel) = [nel 1 2 3];
+            else
+                connectivity(1:4, iel) = [iel-3 iel-2 iel-1 iel];
+            end
+        end
+    end
+    %  connectivity(1:numel(c), iel) = c;
+    nsh(iel) = nnz (connectivity(:,iel));
 end
 
 nsh_max = max (nsh);

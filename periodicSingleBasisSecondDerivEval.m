@@ -15,9 +15,9 @@ function val = periodicSingleBasisSecondDerivEval( U, u, elem, p )
 
 
 
-if p~=2
-    error('not implemented for degree other than 2 yet, sorry!');
-end
+% if p~=2
+%     error('not implemented for degree other than 2 yet, sorry!');
+% end
 
 index=elem+p; %index in the knots where that element begins
 offset=periodicOffset(U, U(index), u); %How far from the start of that knot u is periodically

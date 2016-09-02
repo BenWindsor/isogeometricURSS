@@ -13,10 +13,8 @@ function val = periodicSingleBasisDerivEval( U, u, elem, p )
 % point on the B-Spline that corresponds to our point on the periodic basis
 % spline.
 
-
-
-if p~=2
-    error('not implemented for degree other than 2 yet, sorry!');
+if (p>3)
+    error('Not implemented for p>3');
 end
 
 index=elem+p; %index in the knots where that element begins

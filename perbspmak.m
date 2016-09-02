@@ -9,8 +9,12 @@ dim = np(1);
 pernurb.dim    = dim;
 pernurb.number=np(2); %number of control points
 pernurb.coefs=coefs;
-%pernurb.order=size(knots,2)-np(2); %one more than degree
-pernurb.order=3;
+
+% Count occurence of repeated start knots to get order
+singleValues=unique(knots); 
+counts=histc(knots,singleValues);
+pernurb.order=counts(1);
+
 knots=sort(knots);
 pernurb.knots=knots;
 
