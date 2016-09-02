@@ -22,7 +22,7 @@ for j=1:numel(u)
             elseif l==2
                 dersv(j,l,k)=periodicSingleBasisDerivEval(U,u(j),nonZeroBasis(k),p);
             else
-                dersv(j,l,k)=0;
+                dersv(j,l,k)=periodicSingleBasisSecondDerivEval(U, u(j), nonZeroBasis(k),p);
             end
         end
     end

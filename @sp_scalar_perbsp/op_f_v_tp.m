@@ -56,15 +56,15 @@ function rhs = op_f_v_tp (space, msh, coeff)
 %     else
 %         rhs=rhs+nextVal;
 %     end
-    fprintf('before x print\n');
-    x{:}
-    coeff (x{:})
-    fprintf('after x print\n');
-    fprintf('debug in op_f_v_tp.m\n')
-    %disp(x{:});
-    disp(op_f_v (sp_col, msh_col, coeff (x{:})));
-    fprintf('\n');
-    
+%     fprintf('before x print\n');
+%     x{:}
+%     coeff (x{:})
+%     fprintf('after x print\n');
+%     fprintf('debug in op_f_v_tp.m\n')
+%     %disp(x{:});
+%     disp(op_f_v (sp_col, msh_col, coeff (x{:})));
+%     fprintf('\n');
+%     
   end
 
 end
