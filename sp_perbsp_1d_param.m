@@ -48,28 +48,28 @@ for iel=1:nel
     %   c = numperbsp(knots, nodes(:,iel)', p);
     %c = unique(c(:))+1; % QUESTION: do I remove the +1 here?? as we are now counting from 0 anyway?
     %   c = unique(c(:));
-    
+
     if p==2
         %Altered to make correct connectivity array by hand
-        if iel==1
-            connectivity(1:3, iel) = [nel-1 nel 1];
+        if iel==1            
+            connectivity(1:3, iel) = [1 nel nel-1];
         else
-            if iel==2
-                connectivity(1:3, iel) = [nel 1 2];
+            if iel==2             
+                connectivity(1:3, iel) = [2 1 nel];
             else
-                connectivity(1:3, iel) = [iel-2 iel-1 iel];
+                connectivity(1:3, iel) = [iel iel-1 iel-2];
             end
         end
     elseif p==3
         if iel==1
-            connectivity(1:4, iel) = [nel-2 nel-1 nel 1];
+            connectivity(1:4, iel) = [1 nel nel-1 nel-2];
         else
             if iel==2
-                connectivity(1:4, iel) = [nel-1 nel 1 2];
+                connectivity(1:4, iel) = [2 1 nel nel-1];
             elseif iel==3
-                connectivity(1:4, iel) = [nel 1 2 3];
+                connectivity(1:4, iel) = [3 2 1 nel];
             else
-                connectivity(1:4, iel) = [iel-3 iel-2 iel-1 iel];
+                connectivity(1:4, iel) = [iel iel-1 iel-2 iel-3];
             end
         end
     end
