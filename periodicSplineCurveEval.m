@@ -3,7 +3,7 @@ function val = periodicSplineCurveEval( U, u, p, ctrl )
 % INPUT:
 % U = OPEN UNIFORM knot vector
 % u = eval point/s
-% p = degrree HAS TO BE DEGREE 2 at the moment
+% p = degrree HAS TO BE DEGREE 2 or 3 at the moment
 % ctrl = control points in dimensions higher then structure ctrl like:
 % [x1 x2 x3 x4;
 %  y1 y2 y3 y4] etc.
