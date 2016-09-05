@@ -25,15 +25,40 @@ for j=1:numel(u)
         val(j)=periodicBasisEval(U,0,elem,p);
         break;
     end
+    
+    if p==1
+        % Case of no periodicity to account for
+        if elem<=(elemNum-p)
+            normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
+            operator=localPeriodicOperator(U, u(j), p, elem);
+            newVals=operator*normalVals;
+            val(j)=newVals(2);
+            % Case where 'end' functions overflow to 'beginning'
+        else
+            if elem==elemNum
+                if evalElem==1
+                    normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);
+                    operator=localPeriodicOperator(U, u(j), p, evalElem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(1);
+                else
+                    normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
+                    operator=localPeriodicOperator(U, u(j), p, elem);
+                    newVals=operator*normalVals;
+                    val(j)=newVals(2);
+                    
+                end
+            end
+        end
         
-    if p==2
+    elseif p==2
         % Case of no periodicity to account for
         if elem<=(elemNum-p)
             normalVals=localBasisSplineVectorEval(U, u(j), elem, p);
             operator=localPeriodicOperator(U, u(j), p, elem);
             newVals=operator*normalVals;
             val(j)=newVals(3);
-            % Case where 'end' functions overflow to 'beginning'
+        % Case where 'end' functions overflow to 'beginning'
         else
             %The function overflowing into element 1
             if elem==(elemNum-1)
@@ -73,6 +98,7 @@ for j=1:numel(u)
                 end
             end
         end
+        
     elseif p==3
            % Case of no periodicity to account for
         if elem<=(elemNum-p)
@@ -128,7 +154,7 @@ for j=1:numel(u)
                     newVals=operator*normalVals;
                     val(j)=newVals(4);
                 end
-                %The function overflowing into element 1 and 2
+            %The function overflowing into element 1, 2 and 3
             elseif elem==(elemNum)
                 if evalElem==1
                     normalVals=localBasisSplineVectorEval(U, u(j), evalElem, p);

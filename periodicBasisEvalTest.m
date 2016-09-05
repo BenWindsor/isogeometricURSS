@@ -1,3 +1,23 @@
+% Degree 1 test
+U=[0 0  0.2 0.4 0.6 0.8 1.0 1.0];
+p=1;
+i=3;
+span=findSpan(U,0.1);
+hold on;
+title('Degree 1 splines');
+for i=1:6
+    fplot(@(x)(basisSplineEval(U, x, i, p)), [0, 0.999]);
+end
+figure
+
+title('Degree 1 periodic splines');
+hold on;
+for i=1:5
+    fplot(@(x)(periodicBasisEval(U, x, i, p)), [0 0.9999]);
+end
+figure;
+
+
 % Degree 2 test
 U=[0 0 0 0.2 0.4 0.6 0.8 1.0 1.0 1.0];
 p=2;
