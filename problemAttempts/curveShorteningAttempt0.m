@@ -5,8 +5,8 @@
 % Set up fixed surface parameters
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
-degree=2;
-elemNum=29;
+degree=3;
+elemNum=19;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -26,13 +26,12 @@ D=1;
 M = op_u_v_tp(space, space, msh); %mu = 1
 A = D*op_gradu_gradv_tp(space, space, msh); %epsilon = 1
 mat = (1/delta)*(M)+A;
-
 % Resize mat
 M=M(1:elemNum, 1:elemNum);
 mat=mat(1:elemNum, 1:elemNum);
 
 % Get c_0
-curveC_0=periodicCurveInterpolate(elemNum, 2, @(x)(sin(6*pi*x)));
+curveC_0=periodicCurveInterpolate(elemNum, p, @(x)(sin(6*pi*x)));
 % Assemble RHS
 %c_0=ones(sqrt(numel(M)),1); %initialise C_0 first value all ones
 c_0=curveC_0.coefs';

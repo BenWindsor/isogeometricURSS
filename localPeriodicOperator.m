@@ -11,7 +11,9 @@ function operator = localPeriodicOperator( U, u, p, elem )
 
 
 % TEMPORARY IMPLEMENTATION
-if p==2
+if p==1
+    operator=[1 0; 0 1];
+elseif p==2
     operator=localPeriodicOperatorDeg2(U, elem);
 elseif p==3
     operator=localPeriodicOperatorDeg3(U, elem);

@@ -6,7 +6,7 @@
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
 degree=2;
-elemNum=29;
+elemNum=15;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
