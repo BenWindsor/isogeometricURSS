@@ -1,0 +1,112 @@
+\documentclass[a4paper, 11pt]{article}
+\title{URSS 2016: Approximation and simulation of cellular motility with isogeometric analysis}
+\author{Ben Windsor}
+\date{}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bbm}
+\usepackage{listings}
+
+\lstset{language=Matlab}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  In the following report I would like to lay out the progress my supervisor Bjorn Stinner and I made in Summer 2016 on the problem of applying isogeometric analysis to the modelling of cellular motility. 
+\end{abstract}
+
+\pagebreak
+\section{Motivation}
+Cellular motility is the biological term that encapsulates the motion of a cell. Often this motion is in response to some kind of stimulus, chemical stimulus for example causes movement that we refer to as chemotaxs, where the postfix '-taxis' means the response to some kind of stimuls and the prefix 'chemo-' is of course refering to the fact that it is a chemical stimulating the movement. Other kinds of taxis include thermotaxis, in response to heat and hydrotaxis, in response to water to name but a few. Cellular motility plays a crucial role in many of the biological processes in our own bodies and as such, a deeper understanding of such processes is very valuable. In particular areas such as embryonic development and our understanding of immune responses could benefit.
+
+Pozzi and Stinner have derived in their paper [REFERENCE] a set of equations that can model such cellular motility. They comprise of an equation that models the cell membrane as an evolving hypersurface $\Gamma(t)$ and fields, that is functions $c:\Gamma(t)\rightarrow\mathbb{R}$, on the surface representing different conserved quantities on the cell membrane such as the amount of a particular protein or a certain chemical concentration at a point on the membrane. The equation for the evolution of the membrane is coupled to these fields by a forcing term allowing the fields to influence the evolution and deformation of the membrane, thus simulating movement in response to these fields. 
+
+In most cases, to solve a PDE like this computationally the Galerkin method is used. The equations are multiplied by a test funciton and then integrated. Through integration by parts and integral formulas such as The Divergence Theorem etc. the equation is manipulated to give the 'weak formulation' of the problem. It is named so because the solutions we are searching for are no longer as strictly defined as in the 'strong problem' we started with, since the number of times they need to be differentiable is reduced. In order to get a solution the space of functions which we search is then picked to be some finite dimensional subspace spanned by a known basis of functions. As I will show later, this choice of finite dimensional subspace will yield a set of linear equations that we can solve for an approximate solution. Convergence results exist and can garuntee that ... [REFERENCE]. In the most common type of analysis, Finite Element Methods (FEM), the basis of the function space is picked to be the hat functions [REFERENCE]. These serve their purpose but lack certain desirable properties such as being continuously differentiable.
+
+This leads us to isogeometric analysis, where we pick a basis of splines. Splines are functions used originally for interpolation. They are useful because the degree of continuous differentiablilty can be specified, and given some correct boundary conditions all that is needed to be solved is a set of linear equations to get an approximation with the desired level of smoothness. From splines we can create Basis Splines (B-Splines) which form a basis of the function space of whatever degree we require. In isogeometric analyis, it is these B-Splines that we make use of instead of the hat functions of FEM as our basis. The smoothness properties the B-Splines help to yield faster rates of convergence to higher levels of accuracy with less discretisation of the space [REFERENCE - Hughes?].
+
+\pagebreak
+\section{The Strong Formulation}
+The general form of an evolving hypersurface coupled with a PDE on the hypersurface is written as such:
+\begin{equation}
+  \partial^{\bullet(v)}_t c + c\nabla_\Gamma\bullet v = \Delta_\Gamma c + S_c
+\end{equation}
+\begin{equation}
+  v=\kappa v + f(c)v + S_u
+\end{equation}
+We further assume that $\Gamma(t)$ can be parameterised by maps $u(\hat(x),t):S^1\rightarrow\mathbb{R}^2$ where for each $t\in[0,T]$ we then will have $u(S^1, t)=\Gamma(t)$. With this parameterisation we can then transform our problem from our physical domain of the curve to our reference domain of $S^1$. This yields: 
+\begin{equation}
+  \hat{c}_t + \hat{c}\frac{|u_{\hat{x}}|_t}{|u_{\hat{x}}|} - \frac{1}{|u_{\hat{x}}|}\left(\frac{\hat{c}_{\hat{x}}}{|u_{\hat{x}}|}\right)_{\hat{x}} = \hat{S}_c
+\end{equation}
+\begin{equation}
+  u_t - \frac{1}{|u_{\hat{x}}|}\left(\frac{u_{\hat{x}}}{|u_{\hat{x}}|}\right)_{\hat{x}} = f(\hat{c})\frac{u_{\hat{x}}^\bot}{|u_{\hat{x}}|}+\hat{S}_u 
+\end{equation}
+
+\pagebreak
+\section{Splines}
+I'll now take a brief digression to define the spline curves that we are using in our approximations. The B-Splines are defined recursively from indicator functions and they map values from a parameter domain which we split up into sections upon which each B-Spline of degree 0 [SIC 0 or 1] is defined. The higher degree B-Splines are then defined recursively from this first level of B-Splines. Throughout this paper I shall take the domain to be the interval $[0, 1]$ though in general it may be any real interval $[a, b]$. The points that we use to split up our domain are called 'knots' and the list of our knots is called a 'knot vector' usually denoted $\Xi$. By convention the first knot will always have value $0$ and the last knot will have value $1$. On a knot vector $\Xi={\xi_0, \xi_1, ..., \xi_n}$ the i'th degree 0 [SIC 0 or 1] B-Spline is then defined, using indicator notaiton, as: 
+\begin{equation*}
+  B_{i,0}(x)=\mathbbm{1}_{[\xi_{i}, \xi_{i+1})}
+\end{equation*}
+The higher degree splines are then defined recursively as:
+\begin{equation*}
+  B_{i,p}(x) = \frac{x-\xi_i}{\xi_{i+p-1} - \xi_i}B_{i,p-1}(x) + \frac{\xi_{i+p}-x}{\xi_{i+p}-\xi_{i+1}}B_{i+1, k-1}(x)
+\end{equation*}
+This gives curves like the following [PICTURE OF SPLINES].
+From these basis splines you can then assemble a spline curve $f:[0, 1]\rightarrow\mathbb{R}^m$ by picking a number of 'control points' $C_0, ... , C_l$ in $\mathbb{R}^m$ and summing over each basis function multiplied by the specific control point, forming a linear combination of the basis splines as follows:
+\begin{equation*}
+  f(x)=\sum_{i}C_iB_{i,p}(x)
+\end{equation*}
+In our application the fields we are approximating need to be periodic as they are acting on a closed curve and so we define an operator $T^{per}$ as in [HUGHES REFERENCE] that transforms a basis spline into a periodic basis spline assuming our knot vector has certain properties. From here we obtain a new periodic basis of our degree $p$ function space given by $B_{i,p}^{per}=T^{per}B_{i,p}$ which we can use to approximate our periodic functions. 
+
+\pagebreak
+\section{The Weak Formulation}
+Multiplying the equations [REFERENCE EQUATION NUMS] by a test function $\zeta \in V$ and $\varphi \in V$ respectively, for some function space $V$, integrating and then using some integral identites and integration by parts we get the following weak problem. Find $u, c$ [SPECIFY RANGE AND DOMAIN] such that for all $\zeta$ and $\varphi$ in $V$ the following equations hold: [SHOULD BE U HAT?]
+\begin{equation}
+  \int\limits_{S^1}u_t\cdot\hat{\varphi}|u_{\hat{x}}| + \frac{u_{\hat{x}}\cdot\hat{\varphi}_{\hat{x}}}{|u_{\hat{x}}|}d\hat{x} = \int\limits_{S^1}f(\hat{c})u_{\hat{x}}^\bot\cdot\hat{\varphi} + \hat{S}_u\cdot\hat{\varphi}d\hat{x}
+\end{equation}
+\begin{equation}
+  \frac{d}{dt}\left(\int\limits_{S^1}\hat{c}\hat{\zeta}|u_{\hat{x}}|d\hat{x}\right) + \int\limits_{S^1}\frac{\hat{c}_{\hat{x}}\hat{\zeta}_{\hat{x}}}{|u_{\hat{x}}|}d\hat{x} = \int\limits_{S^1}\hat{S}_c\hat{\zeta}d\hat{x}
+\end{equation}
+\pagebreak
+
+\pagebreak
+\section{Discretisation}
+To approximate our function space $V$ we fix the degree of our approximation to get the finite dimensional space $V_h=span\left\{B_{i,p}^{per} : i \in 1, ..., N\right\}$ where N is the number of elements (N.B. not in the set theoretic sense) in our knot vector $\Xi$ i.e. the number of non-empty intervals. This is important as the repeated knots means the number of knots and the number of elements are not equal. This gives our discretisation in space. As the equations are time dependant over some interval of time $[0, T]$ we also discretise time by picking a $\delta$ time-step such that we then have $[0, T]$ split into discrete steps of size $\delta$. To denote our functions at the time step $m\delta$ for some $m \in 0,...,M-1$ where $m(M-1)=T$ [CORRECT?] we use the notation $f^{\left(m\right)}$ to mean the function $f$ at the $m$'th time step. To approximate our derivative we use an implicit Euler scheme. So approximating our $u \in V$ with $u_h \in V_h$ and similarly for our $\zeta$ and $\varphi$ we use $\zeta_h$ and $\varphi_h$ we get the discrete versions of our weak formulation [EQUATION NUMBER]: [DEFINE u tilda] 
+\begin{equation}
+  \int\limits_{S^1}\frac{u_h^{\left(m+1\right)}-\widetilde{u}_h^{\left(m\right)}}{\delta}\cdot\hat{\varphi}_h|\widetilde{u}_{h_{\hat{x}}}^{\left(m\right)}| + \frac{u_{h_{\hat{x}}}^{\left(m+1\right)}\cdot\hat{\varphi}_{h_{\hat{x}}}}{|u_{h_{\hat{x}}}^{\left(m\right)}|}d\hat{x} = \int\limits_{S^1}f(\hat{c}_h^{\left(m\right)})\left(\widetilde{u}_{h_{\hat{x}}}^{\left(m\right)}\right)^\bot\cdot\hat{\varphi}_h + \hat{S}_u^{\left(m+1\right)}\cdot\hat{\varphi}_hd\hat{x}
+\end{equation}
+\begin{equation}
+  \frac{1}{\delta}\left(\int\limits_{S^1}\hat{c}_h^{\left(m+1\right)}\hat{\zeta}_h|\widetilde{u}_{h_{\hat{x}}}^{\left(m+1\right)}|d\hat{x} - \int\limits_{S^1}\hat{c}_h^{\left(m\right)}\hat{\zeta}_h|\widetilde{u}_{h_{\hat{x}}}^{\left(m\right)}|d\hat{x}\right) + \int\limits_{S^1}\frac{\hat{c}_{h_{\hat{x}}}^{\left(m+1\right)}\hat{\zeta}_{h_{\hat{x}}}}{|u_{h_{\hat{x}}}^{\left(m+1\right)}|}d\hat{x} = \int\limits_{S^1}\hat{S}_c^{\left(m+1\right)}\hat{\zeta}_hd\hat{x}
+\end{equation}
+Through suitable push forwards [DEFINE] we can transform these equations to ones on the surface. This is desirable as that is the format that the geoPDEs library we will use to solve the equations uses. This then gives the equivalent equations: [DEFINE SURF DERIV?]
+\begin{equation}
+  \int\limits_{\Gamma^{\left(m\right)}_h}\frac{u_h^{\left(m+1\right)}-\widetilde{u}_h^{\left(m\right)}}{\delta}\cdot\varphi_h + \nabla_{\Gamma_h^{\left(m\right)}}u_h^{\left(m+1\right)}:\nabla_{\Gamma_h^{\left(m\right)}}\varphi_{h}dx = \int\limits_{\Gamma^{\left(m\right)}_h}f(\hat{c}_h^{\left(m\right)})\widetilde{\nu}_h^{\left(m\right)}\cdot\varphi_h + S_u^{\left(m+1\right)}\cdot\varphi_hdx
+\end{equation}
+\begin{equation}
+  \frac{1}{\delta}\left(\int\limits_{\Gamma_h^{\left(m+1\right)}}c_h^{\left(m+1\right)}\zeta_hdx - \int\limits_{\Gamma_h^{\left(m\right)}}c_h^{\left(m\right)}\zeta_hdx\right) + \int\limits_{\Gamma_h^{\left(m+1\right)}}\nabla_{\Gamma_h^{\left(m+1\right)}}c_{h}^{\left(m+1\right)}:\nabla_{\Gamma_h^{\left(m+1\right)}}\zeta_{h}dx = \int\limits_{\Gamma_h^{\left(m+1\right)}}S_c^{\left(m+1\right)}\zeta_hdx
+\end{equation}
+
+\pagebreak
+\section{The Approximaton}
+
+\pagebreak
+\section{Software}
+In order to implement our isogeometric analysis we searched for existing tools that implement the geometry, quadrature and operators that we needed to use. There are several fleshed out isogeometric analysis libraries for multiple langages such as igatools [REFERENCE], geoPDEs [REFERENCE] and g-smo [REFERENCE]. In the end we decided to go with geoPDEs in MATLAB as it offered all of the tools we required at the time. The one feature lacking from each isogeometric analysis library was the periodic basis. There are ways to implement periodic boundary conditions in many of the libraries, but none implement the periodic basis that we wanted to use.
+
+Because of this I decided to write the code for such a basis and adapt it to make use of the already existing geoPDEs framework. You can find this code at [CODE LINK?]. This new set of basis functions interfaces with the geoPDEs library in exactly the same was as the nurbs functionality does and so we could make use of the existing code for the creation of the function space and the operators on each space by passing in the values in the correct format. A simple file to solve a problem with my periodic spline toolkit may look like the following:
+\begin{lstlisting}[frame=single]
+  U=knot vector;
+  ctrl=control points;
+  crv=perbspmak(ctrl, U);
+  geometry=geo_load(crv);
+  knots=geometry.perbspline.knots;
+  [qn qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(crv.order));
+  msh = msh_cartesian(knots, qn, qw, geometry);
+
+  space = sp_perbsp(crv, msh);
+\end{lstlisting}
+\end{document}
