@@ -2,8 +2,6 @@ function sp = sp_perbsp_1d_param( knots, degree, nodes, varargin )
 % An analagous version of sp_bspline_1d_param.m but for periodic basis
 % splines
 
-%IMPLEMENT: handle hessian, so set up second derivatives.
-
 %Check arguments in to see if gradient specified true or false. True by
 %default
 gradient = true; 
@@ -42,38 +40,11 @@ nqn = size (nodes, 1);
 nsh = zeros (1, nel);
 connectivity = zeros (p+1, nel);
 for iel=1:nel
-    %s = findspan(mcp, p, nodes(:, iel)', knots);
-    s = findSpan(knots,nodes(:,iel)');
-    %c = numbasisfun(s, nodes(:, iel)', p, knots); %WRITE numperbasisfun.m
-    %   c = numperbsp(knots, nodes(:,iel)', p);
-    %c = unique(c(:))+1; % QUESTION: do I remove the +1 here?? as we are now counting from 0 anyway?
-    %   c = unique(c(:));
 
-    if p==2
-        %Altered to make correct connectivity array by hand
-        if iel==1            
-            connectivity(1:3, iel) = [1 nel nel-1];
-        else
-            if iel==2             
-                connectivity(1:3, iel) = [2 1 nel];
-            else
-                connectivity(1:3, iel) = [iel iel-1 iel-2];
-            end
-        end
-    elseif p==3
-        if iel==1
-            connectivity(1:4, iel) = [1 nel nel-1 nel-2];
-        else
-            if iel==2
-                connectivity(1:4, iel) = [2 1 nel nel-1];
-            elseif iel==3
-                connectivity(1:4, iel) = [3 2 1 nel];
-            else
-                connectivity(1:4, iel) = [iel iel-1 iel-2 iel-3];
-            end
-        end
+    for i=1:(p+1)
+        connectivity(i, iel)= periodicElemCalc(knots, degree, iel, -(i-1));
     end
-    %  connectivity(1:numel(c), iel) = c;
+
     nsh(iel) = nnz (connectivity(:,iel));
 end
 
@@ -90,13 +61,6 @@ nbf = reshape(nbf, size(s,1), size(s,2), p+1);
 
 
 ders = zeros (numel(nodes), nders+1, nsh_max);
-%DEBUG  --------------------------------------------------------
-% fprintf('sp_perbsp_1d_param.m debug line 65\n');
-% fprintf('\n');
-% fprintf('size(ders) before: ');
-% fprintf(mat2str(size(ders)));
-% fprintf('\n');
-%END DEBUG------------------------------------------------------
 
 for inqn = 1:numel(nodes)
   [ir,iel] = ind2sub (size(nodes),inqn);
@@ -105,42 +69,7 @@ for inqn = 1:numel(nodes)
   ind=1;
   %END TEST FIX
   ders(inqn,:,ind:ind+p) = tders(inqn,:,:);
-    %DEBUG  --------------------------------------------------------
-%     fprintf('\n');
-%     fprintf('size(ders) during loop: ');
-%     fprintf(mat2str(size(ders)));
-%     fprintf('\n');
-%     fprintf('ind: ');
-%     fprintf(mat2str(ind));
-%     fprintf('\n');
-    %END DEBUG------------------------------------------------------
 end
-
-% DEBUG ---------------------------------------------------------
-% fprintf('sp_perbsp_1d_param.m debug line 84\n');
-% fprintf('tders: ');
-% fprintf(mat2str(tders(:,:,1)));
-% % fprintf('nbf: ');
-% % fprintf(mat2str(nbf));
-% fprintf('numel(nodes): ');
-% fprintf(num2str(numel(nodes)));
-% fprintf('\n');
-% fprintf('nders+1: ');
-% fprintf(num2str(nders+1));
-% fprintf('\n');
-% fprintf('nsh_max: ');
-% fprintf(num2str(nsh_max));
-% fprintf('\n');
-% fprintf('ders(:,:,1): ');
-% fprintf(mat2str(ders(:,:,1)));
-% fprintf('\n');
-% fprintf('size(ders) after: ');
-% fprintf(mat2str(size(ders)));
-% fprintf('\n');
-% fprintf('nsh: ');
-% fprintf(mat2str(nsh));
-% fprintf('\n');
-% END DEBUG --------------------------------------------------------
 
 supp = cell (ndof, 1);
 for ii = 1:ndof
