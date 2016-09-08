@@ -1,6 +1,4 @@
-% SOLUTION: c(x,t)=t*cos(8Pi*x)+(1-t)sin(6Pi*x)
-% SOURCE: s(x,t)=(1+16t)cos(8Pi*x)+(8-9t)sin(6Pi*x)
-% SURFACE: unit circle
+%Curve shortening flow of the unit circle with no forcing term SINGLE STEP
 
 % Set up fixed surface parameters
 xHandle=@(x)(cos(2*pi*x));
@@ -22,85 +20,39 @@ space=sp_perbsp(geometry.perbspline, msh);
 
 % Set time step
 delta=0.05;
-% QUESTION: no diffusion constant D?? set it to 1??
-% QUESTION: what is the value of c_0?? all zeros
 
-% Assemble LHS
-D=1; 
 M = op_u_v_tp(space, space, msh); %mu = 1
-A = D*op_gradu_gradv_tp(space, space, msh); %epsilon = 1
+M=M(1:elemNum, 1:elemNum);
+A = op_gradu_gradv_tp(space, space, msh); %epsilon = 1
+A=A(1:elemNum, 1:elemNum);
 mat = (1/delta)*(M)+A;
 
-% Resize mat
-M=M(1:elemNum, 1:elemNum);
-mat=mat(1:elemNum, 1:elemNum);
 
-% Get c_0
-curveC_0=periodicCurveInterpolate(elemNum, 2, @(x)(sin(6*pi*x)));
-% Assemble RHS
-%c_0=ones(sqrt(numel(M)),1); %initialise C_0 first value all ones
-c_0=curveC_0.coefs';
-t=0;
-% Provide source function for solution field on reference domain \hat{c}=tcos(8pix)+(1-t)sin(6pix)
-f=@(x,y)((1+16*(t+1)*delta)*cos(8*pi*inverseCircle(x,y))+(8-9*(t+1)*delta)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
-S=op_f_v_tp(space, msh, f ); 
-S=S(1:elemNum);
-rhs=(1/delta)*M*c_0+S;
+prevxCoefs=crv.coefs(1,:);
+prevyCoefs=crv.coefs(2,:);
 
-% resize rhs
-rhs=rhs(1:elemNum);
+steps=5;
 
-% calculate results
-initialResults=mat\rhs;
+newxCoefs=zeros(steps, elemNum);
+newyCoefs=zeros(steps, elemNum);
 
+% Calculate solutions
+for i=1:steps
+    rhs1=(1/delta)*M*prevxCoefs' + 0; %+0 for forcing term 
+    rhs2=(1/delta)*M*prevyCoefs' + 0;
 
-% set up array to store results
-stepNumber=5;
-results=zeros(numel(rhs),stepNumber);
-
-prevResults=initialResults;
-for step=1:stepNumber
-    % update rhs
-    t=delta*(step+1);
-    f=@(x,y)((1+16*t)*cos(8*pi*inverseCircle(x,y))+(8-9*t)*sin(6*pi*inverseCircle(x,y)));
-    S=op_f_v_tp(space, msh, f );
+    newxCoefs(i,:)=mat\rhs1;
+    newyCoefs(i,:)=mat\rhs2;
     
-    % resize S
-    S=S(1:elemNum);
-    
-    % Solve
-    rhs=(1/delta)*M*prevResults+S;
-  
-    % resize rhs
-    rhs=rhs(1:elemNum);
-    
-    % Solve equation
-    c_i=mat\rhs;
-    results(:,step)=c_i;
-    
-    % Store current time step for next rhs update
-    prevResults=c_i;
-    disp(c_i);
-    
-    
+    prevxCoefs=newxCoefs(i,:);
+    prevyCoefs=newyCoefs(i,:);
 end
 
-% Print results
+% Plot solutions
 hold on;
-% Inital solution for t=0
-perbspplot(perbspmak(initialResults', knots), 1);
-title('Approximated soltuions');
-% Time step results
-for i=1:stepNumber
-    perbspplot(perbspmak(results(:,i)', knots), 1);
-end
-figure;
-
-% Print some sample solutions
-hold on;
-title('actual solutions');
-%Inital solution for t=0;
-%fplot(@(x)((delta*0)*cos(8*pi*x)+(1-(delta*0))*sin(6*pi*x)), [0 1])
-for i=1:(stepNumber+1)
-    fplot(@(x)((delta*i)*cos(8*pi*x)+(1-(delta*i))*sin(6*pi*x)), [0 1]);
+for i=1:steps
+    newCoefs=[newxCoefs(i,:); newyCoefs(i,:)];
+    newCrv=perbspmak(newCoefs, knots);
+    perbspplot(crv, 100);
+    perbspplot(newCrv, 100);
 end
