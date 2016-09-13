@@ -1,10 +1,10 @@
 %Curve shortening flow of the unit circle with no forcing term SINGLE STEP
 
 % Set up fixed surface parameters
-xHandle=@(x)(cos(2*pi*x));
-yHandle=@(x)(sin(2*pi*x));
+xHandle=@(x)(nonUniformCircleXParam(x));
+yHandle=@(x)(nonUniformCircleYParam(x));
 degree=2;
-elemNum=23;
+elemNum=19;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -19,7 +19,7 @@ msh=msh_cartesian(knots, qn, qw, geometry);
 space=sp_perbsp(geometry.perbspline, msh);
 
 % Set time step
-delta=0.02;
+delta=0.05;
 
 M = op_u_v_tp(space, space, msh); %mu = 1
 M=M(1:elemNum, 1:elemNum);
@@ -73,13 +73,13 @@ end
 hold on;
 for i=1:steps
     newCoefs=[newxCoefs(i,:); newyCoefs(i,:)];
-    %scatter(newxCoefs(i,:), newyCoefs(i,:), 'x');
+    scatter(newxCoefs(i,:), newyCoefs(i,:), 'x');
     newCrv=perbspmak(newCoefs, knots);
     %perbspplot(crv, 100);
     perbspplot(newCrv, 100);
 end
 
-Plot actual
+% Plot actual
 hold on;
 for i=1:steps
     sp=linspace(0,1,50);

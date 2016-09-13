@@ -42,8 +42,10 @@ curveC_0=periodicCurveInterpolate(elemNum, 2, @(x)(sin(6*pi*x)));
 c_0=curveC_0.coefs';
 t=0;
 % Provide source function for solution field on reference domain \hat{c}=tcos(8pix)+(1-t)sin(6pix)
-f=@(x,y)((1+16*(t+1)*delta)*cos(8*pi*inverseCircle(x,y))+(8-9*(t+1)*delta)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
-S=op_f_v_tp(space, msh, f ); 
+%f=@(x,y)((1+16*(t+1)*delta)*cos(8*pi*inverseCircle(x,y))+(8-9*(t+1)*delta)*sin(6*pi*inverseCircle(x,y))); %QUESETION: start at t=0 here?
+%S=op_f_v_tp(space, msh, f ); 
+f=@(x)((1+16*(t+1)*delta)*cos(8*pi*x)+(8-9*(t+1)*delta)*sin(6*pi*x)); %QUESETION: start at t=0 here?
+S=op_f_v_tp_param(space, msh, f ); 
 S=S(1:elemNum);
 rhs=(1/delta)*M*c_0+S;
 
@@ -62,9 +64,10 @@ prevResults=initialResults;
 for step=1:stepNumber
     % update rhs
     t=delta*(step+1);
-    f=@(x,y)((1+16*t)*cos(8*pi*inverseCircle(x,y))+(8-9*t)*sin(6*pi*inverseCircle(x,y)));
-    S=op_f_v_tp(space, msh, f );
-    
+    %f=@(x,y)((1+16*t)*cos(8*pi*inverseCircle(x,y))+(8-9*t)*sin(6*pi*inverseCircle(x,y)));
+    %S=op_f_v_tp(space, msh, f );
+    f=@(x)((1+16*t)*cos(8*pi*x)+(8-9*t)*sin(6*pi*x));
+    S=op_f_v_tp_param(space, msh, f ); 
     % resize S
     S=S(1:elemNum);
     
@@ -80,7 +83,6 @@ for step=1:stepNumber
     
     % Store current time step for next rhs update
     prevResults=c_i;
-    disp(c_i);
     
     
 end

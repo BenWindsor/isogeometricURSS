@@ -31,7 +31,7 @@ M=M(1:elemNum, 1:elemNum);
 mat=mat(1:elemNum, 1:elemNum);
 
 % Get c_0
-curveC_0=periodicCurveInterpolate(elemNum, p, @(x)(sin(6*pi*x)));
+curveC_0=periodicCurveInterpolate(elemNum, degree, @(x)(sin(6*pi*x)));
 % Assemble RHS
 %c_0=ones(sqrt(numel(M)),1); %initialise C_0 first value all ones
 c_0=curveC_0.coefs';

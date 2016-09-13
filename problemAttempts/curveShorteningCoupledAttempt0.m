@@ -3,7 +3,7 @@ t=0;
 xHandle=@(x)((1+0.25*exp(-t))*cos(2*pi*x));
 yHandle=@(x)((1+0.25*exp(-t))*sin(2*pi*x));
 degree=2;
-elemNum=35;
+elemNum=19;
 
 % Create initial geometry and test space 
 prevCrv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -15,15 +15,8 @@ prevMsh=msh_cartesian(knots, qn, qw, prevGeometry);
 prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set time step
-delta=0.05;
-stepNum=5;
-
-% Calculate curve/surface stifness and mass matrices
-crvM = op_u_v_tp(prevSpace, prevSpace, prevMsh); %mu = 1
-crvM=crvM(1:elemNum, 1:elemNum);
-crvA = op_gradu_gradv_tp(prevSpace, prevSpace, prevMsh); %epsilon = 1
-crvA=crvA(1:elemNum, 1:elemNum);
-crvMat = (1/delta)*(crvM)+crvA;
+delta=1.0;
+stepNum=10;
 
 % Setup initial field values
 prevFieldCoefs=0.8*ones(elemNum, 1);
@@ -55,7 +48,11 @@ for step=1:stepNum
     % Update field
     fieldM=op_u_v_tp(newSpace, newSpace, newMsh);
     fieldM=fieldM(1:elemNum, 1:elemNum);
-    fieldA=op_gradu_gradv_tp(newSpace, newSpace, newMsh);
+    
+    %TEST
+    fieldA=op_gradu_gradv_tp(newSpace, newSpace, newMsh); %Q: should this be prevSpace or newSpace?!
+    %endtest
+    
     fieldA=fieldA(1:elemNum, 1:elemNum);
     fieldMat = (1/delta)*fieldM + fieldA;
     
@@ -89,7 +86,8 @@ end
 figure
 hold on;
 title('Approximated fields');
-for i=1:stepNum
+perbspplot(perbspmak(0.8*ones(1,elemNum),knots),1);
+for i=1:(stepNum)
     perbspplot(perbspmak(storedFieldCoefs(:,i)',knots),1);
 end
 
@@ -97,12 +95,7 @@ end
 figure
 hold on;
 title('Actual fields');
-% Solve the ODE for actual solution
-y0=0.8;
-for i=1:stepNum
-    tspan(i)=i*delta;
-end
-[t, y] = ode45(@(t,y) -y*(-0.25*exp(-t)), tspan, y0);
-for i=1:stepNum
-    fplot(@(x)(y(i)), [0 1]);
+for i=0:stepNum
+    t = i*delta;
+    fplot(@(x)1.0/(1.0+0.25*exp(-t)), [0 1]);
 end
