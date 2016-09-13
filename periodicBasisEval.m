@@ -11,6 +11,10 @@ function val = periodicBasisEval( U, u, elem, p )
 %value at first point of knot as it is periodic, allowing evaluation at
 %e.g. 1 on a knot span [0 1] 
 
+%convert cell of points to normal array if needed
+if iscell(u)
+    u=cell2mat(u);
+end
 
 % Total elements
 elemNum=numel(U)-2*p-1;
