@@ -4,7 +4,7 @@
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
 degree=2;
-N=[11 21 31 41 51];
+N=[11 21 31 41];
 T=1.0;
 errors=zeros(1,numel(N));
 EOCs=zeros(1, numel(N)-1);
@@ -20,7 +20,8 @@ for i=1:numel(N)
     
     % Set up time step etc.
     h=1/N(i);
-    delta=h*h;
+    %delta=h*h;
+    delta=h*h*h;
     sp=linspace(0, 1, N(i));
     
     %Number of steps to get to time t

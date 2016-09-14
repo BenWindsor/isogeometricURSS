@@ -79,7 +79,7 @@ for i=1:steps
     perbspplot(newCrv, 100);
 end
 
-Plot actual
+%Plot actual
 hold on;
 for i=1:steps
     sp=linspace(0,1,50);

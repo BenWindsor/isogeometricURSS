@@ -96,10 +96,18 @@ end
 
 % Plot curves
 hold on;
+sp=linspace(0,1,50);
 for i=1:stepNum
+    % Approx curves
     coefs=[storedxCoefs(:,i)'; storedyCoefs(:,i)'];
     crv=perbspmak(coefs, knots);
     perbspplot(crv, 30);
+    
+    % Actual curves
+    t=i*delta;
+    xPoints=(1+0.25*exp(-t))*cos(2*pi*sp);
+    yPoints=(1+0.25*exp(-t))*sin(2*pi*sp);
+    plot(xPoints, yPoints);
 end
 
 figure

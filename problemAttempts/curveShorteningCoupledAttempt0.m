@@ -1,3 +1,5 @@
+% Evolving field but curve evolution prescribed instead of approximated.
+
 % Set up initial surface 
 t=0;
 xHandle=@(x)((1+0.25*exp(-t))*cos(2*pi*x));
@@ -15,8 +17,8 @@ prevMsh=msh_cartesian(knots, qn, qw, prevGeometry);
 prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set time step
-delta=1.0;
-stepNum=10;
+delta=0.1;
+stepNum=30;
 
 % Setup initial field values
 prevFieldCoefs=0.8*ones(elemNum, 1);
@@ -48,11 +50,7 @@ for step=1:stepNum
     % Update field
     fieldM=op_u_v_tp(newSpace, newSpace, newMsh);
     fieldM=fieldM(1:elemNum, 1:elemNum);
-    
-    %TEST
-    fieldA=op_gradu_gradv_tp(newSpace, newSpace, newMsh); %Q: should this be prevSpace or newSpace?!
-    %endtest
-    
+    fieldA=op_gradu_gradv_tp(newSpace, newSpace, newMsh); 
     fieldA=fieldA(1:elemNum, 1:elemNum);
     fieldMat = (1/delta)*fieldM + fieldA;
     
@@ -77,9 +75,17 @@ end
 % Print curves
 hold on;
 title('Curve evolution');
+sp=linspace(0,1,100);
 for i=1:stepNum
+    % Approx curves
     ctrl=[storedxCoefs(:,i)'; storedyCoefs(:,i)'];
-    perbspplot(perbspmak(ctrl, knots),30);
+    perbspplot(perbspmak(ctrl, knots),30); 
+    
+    % Actual curves
+    t=i*delta;
+    xPoints=(1+0.25*exp(-t))*cos(2*pi*sp);
+    yPoints=(1+0.25*exp(-t))*sin(2*pi*sp);
+    plot(xPoints, yPoints);
 end
 
 % Print approximated fields
