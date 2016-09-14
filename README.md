@@ -22,7 +22,7 @@ Analogues of the geoPDEs library:
 
 New functionality:
 - op_f_v_tp_param = a version of op_f_v_tp that takes values in the parametric domain instead of on the curve/mesh
-- op_f_u_v_tp_param = a new operator calculating (f*u_i, v_i) with f taking values in the parametric domain
+- op_u_v_tp_param = a version of op_u_v_tp that takes values in the parametric domain instead of on the curve/mesh
 
 From here all operators in sp_scalar and msh operations can be called as usual.
 
