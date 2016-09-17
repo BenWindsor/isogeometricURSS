@@ -22,7 +22,12 @@ for j=1:numel(u)
             elseif l==2
                 dersv(j,l,k)=periodicSingleBasisDerivEval(U,u(j),nonZeroBasis(k),p);
             else
-                dersv(j,l,k)=periodicSingleBasisSecondDerivEval(U, u(j), nonZeroBasis(k),p);
+                if p>1
+                    dersv(j,l,k)=periodicSingleBasisSecondDerivEval(U, u(j), nonZeroBasis(k),p);
+                elseif p==1
+                    % If degree 1 just set second deriv to zero
+                    dersv(j,l,k)=0;
+                end
             end
         end
     end
