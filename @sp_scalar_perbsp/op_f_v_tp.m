@@ -37,15 +37,13 @@ function rhs = op_f_v_tp (space, msh, coeff)
     sp_col  = sp_evaluate_col (space, msh_col);
 
     for idim = 1:msh.rdim
-      x{idim} = reshape (msh_col.geo_map(idim,:,:), msh_col.nqn, msh_col.nel);
-      
-     
-      
+      x{idim} = reshape (msh_col.geo_map(idim,:,:), msh_col.nqn, msh_col.nel); 
     end
     
     rhs = rhs + op_f_v (sp_col, msh_col, coeff (x{:}));
     
     
   end
+  
 
 end

@@ -53,7 +53,17 @@ function varargout = op_gradu_gradv_tp (space1, space2, msh, coeff)
 
     A = A + op_gradu_gradv (sp1_col, sp2_col, msh_col, coeffs);
   end
-
+  
+  % As there are less periodic splines the last two rows and cols are zero
+  % so cut them off
+  sp_univ1=space1.sp_univ;
+  sp_univ2=space2.sp_univ;
+  space1Size=size(sp_univ1.connectivity);
+  space2Size=size(sp_univ2.connectivity);
+  elemNum1=space1Size(2);
+  elemNum2=space2Size(2);
+  A=A(1:elemNum1, 1:elemNum2);
+  
   if (nargout == 1)
     varargout{1} = A;
   elseif (nargout == 3)

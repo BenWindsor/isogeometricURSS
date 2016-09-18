@@ -14,6 +14,14 @@ function rhs = op_f_v_tp_param( space, msh, coeff )
     
     
   end
+  
+  % As there are less periodic splines the last two rows and cols are zero
+  % so cut them off
+  sp_univ=space.sp_univ;
+  spaceSize=size(sp_univ.connectivity);
+  elemNum=spaceSize(2);
+  
+  rhs=rhs(1:elemNum);
 
 end
 
