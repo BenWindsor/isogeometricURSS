@@ -1,9 +1,9 @@
 function val = curveShorteningCoupledAttempt2Forcing1( curve, field, x )
+% Forcing term for f=2*field-1
 
 deriv=periodicSplineCurveDerivEval(curve, x);
 l = size(deriv);
 
-%normed=norm(deriv);
 norm = ones(1,l(2));
 fieldEvals=perbspeval(field, x);
 val = zeros(1,l(2));

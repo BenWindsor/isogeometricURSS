@@ -17,7 +17,7 @@ prevMsh=msh_cartesian(knots, qn, qw, prevGeometry);
 prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set time step
-delta=0.05;
+delta=0.1;
 stepNum=5;
 
 % Setup initial field values
@@ -96,7 +96,7 @@ end
 
 % Plot curves
 hold on;
-sp=linspace(0,1,50);
+sp=linspace(0,1,100);
 for i=1:stepNum
     % Approx curves
     coefs=[storedxCoefs(:,i)'; storedyCoefs(:,i)'];
@@ -104,7 +104,7 @@ for i=1:stepNum
     perbspplot(crv, 30);
     
     % Actual curves
-    t=i*delta;
+    t=(i)*delta;
     xPoints=(1+0.25*exp(-t))*cos(2*pi*sp);
     yPoints=(1+0.25*exp(-t))*sin(2*pi*sp);
     plot(xPoints, yPoints);
@@ -112,6 +112,7 @@ end
 
 figure
 hold on;
+title('Approx fields');
 for i=1:stepNum
     field=perbspmak(storedFieldCoefs(:,i)', knots);
     perbspplot(field, 1);

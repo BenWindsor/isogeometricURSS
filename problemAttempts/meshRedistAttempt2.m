@@ -8,7 +8,7 @@
 xHandle=@(x)(nonUniformCircleXParam(x));
 yHandle=@(x)(nonUniformCircleYParam(x));
 degree=2;
-elemNum=29;
+elemNum=23;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -24,10 +24,12 @@ msh=msh_cartesian(knots, qn, qw, geometry);
 space=sp_perbsp(geometry.perbspline, msh);
 
 % Set time step
-delta=0.05;
+delta=0.01;
+steps=50;
 
 % Alpha param
-alpha=0.1;
+alpha=0.01;
+%sigma=0.1;
 
 % Initial matrices
 M = op_u_v_tp(space, space, msh); %mu = 1
@@ -38,7 +40,7 @@ B11 = op_u_v_tp_param(space, space, msh, @(x)(meshRedistAttempt2func11B(crv, x))
 B11 = B11(1:elemNum, 1:elemNum);
 B12 = op_u_v_tp_param(space, space, msh, @(x)(meshRedistAttempt2func12B(crv, x)));
 B12 = B12(1:elemNum, 1:elemNum);
-B21 = B12'; %op_f_u_v_tp_param(space, msh, @(x)(meshRedistAttempt1func1(crv, x)));
+B21 = B12; %op_f_u_v_tp_param(space, msh, @(x)(meshRedistAttempt1func1(crv, x)));
 B21 = B21(1:elemNum, 1:elemNum);
 B22 = op_u_v_tp_param(space, space, msh, @(x)(meshRedistAttempt2func22B(crv, x)));
 B22 = B22(1:elemNum, 1:elemNum);
@@ -52,7 +54,6 @@ prevxCoefs=crv.coefs(1,:);
 prevyCoefs=crv.coefs(2,:);
 prevCoefs=[prevxCoefs'; prevyCoefs'];
 
-steps=5;
 
 %newxCoefs=zeros(steps, elemNum);
 %newyCoefs=zeros(steps, elemNum);
@@ -69,7 +70,6 @@ for i=1:steps
     % Create surface and load geometry
     crv=perbspmak([newCoefs(1:elemNum, i)'; newCoefs((elemNum+1):(2*elemNum),i)'], knots);
     geometry=geo_load(crv);
-    knots=geometry.perbspline.knots;
     
     % Create mesh
     [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(crv.order));
@@ -87,15 +87,13 @@ for i=1:steps
     B11 = B11(1:elemNum, 1:elemNum);
     B12 = op_u_v_tp_param(space, space, msh, @(x)(meshRedistAttempt2func12B(crv, x)));
     B12 = B12(1:elemNum, 1:elemNum);
-    B21 = B12'; %op_f_u_v_tp_param(space, msh, @(x)(meshRedistAttempt1func1(crv, x)));
+    B21 = B12; %op_f_u_v_tp_param(space, msh, @(x)(meshRedistAttempt1func1(crv, x)));
     B21 = B21(1:elemNum, 1:elemNum);
     B22 = op_u_v_tp_param(space, space, msh, @(x)(meshRedistAttempt2func22B(crv, x)));
     B22 = B22(1:elemNum, 1:elemNum);
     Mblock = (alpha/delta) * [M sparse(elemNum,elemNum); sparse(elemNum,elemNum) M];
     Bblock = ((1-alpha)/delta) * [B11 B12; B21 B22];
     Ablock = [A sparse(elemNum,elemNum); sparse(elemNum,elemNum) A];
-    %M=blockSum(M,M);
-    %A=blockSum(A,A);
     mat = sparse(Mblock + Bblock + Ablock);
     
 end

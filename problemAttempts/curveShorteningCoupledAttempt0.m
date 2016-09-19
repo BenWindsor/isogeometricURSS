@@ -18,7 +18,7 @@ prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set time step
 delta=0.1;
-stepNum=30;
+stepNum=5;
 
 % Setup initial field values
 prevFieldCoefs=0.8*ones(elemNum, 1);
@@ -75,7 +75,7 @@ end
 % Print curves
 hold on;
 title('Curve evolution');
-sp=linspace(0,1,100);
+sp=linspace(0,1,50);
 for i=1:stepNum
     % Approx curves
     ctrl=[storedxCoefs(:,i)'; storedyCoefs(:,i)'];

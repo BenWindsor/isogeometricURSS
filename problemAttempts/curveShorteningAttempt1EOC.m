@@ -4,12 +4,12 @@
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
 degree=2;
-N=[11 21 31 41];
+N=[11 21 31 41 51 61];
 T=1.0;
 errors=zeros(1,numel(N));
 EOCs=zeros(1, numel(N)-1);
 
-t=0.1;
+t=0.001;
 hold on;
 sp=linspace(0,1,50);
 xActual=sqrt(1-2*t)*cos(2*pi*sp);

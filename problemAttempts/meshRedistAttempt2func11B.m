@@ -11,6 +11,7 @@ for j=1:1:l(2)
     val(j) = (1/normsqr(j))*(deriv(2,j)*deriv(2,j));
 end
 
+%val=val';
 end
 
 
