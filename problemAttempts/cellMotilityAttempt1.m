@@ -5,7 +5,7 @@ radius=1;
 xHandle=@(x)(radius*cos(2*pi*x));
 yHandle=@(x)(radius*sin(2*pi*x));
 degree=1;
-elemNum=35;
+elemNum=39;
 
 % Set up equation parameters
 actualArea=pi*radius*radius;
@@ -38,12 +38,13 @@ prevMsh=msh_cartesian(knots, qn, qw, prevGeometry);
 prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set parameters delta=time step, alpha=mesh redist. coefficient
-delta=0.001;
-steps=500;
+delta=0.0001;
+steps=20;
 alpha=0.01;
 
 % Set up fields
 initiala1=periodicCurveInterpolate(elemNum, degree, @(x)(0.5));
+%initiala1=periodicCurveInterpolate(elemNum, degree, @(x)(sin(2*pi*x)));
 preva1Coefs=initiala1.coefs';
 % TEST
 % prevalCoefs=0.5*ones(elemNum,1);
@@ -90,11 +91,13 @@ for step=1:steps
     forcingTerm1 = op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1forcing1(prevCrv, preva1, k1, x)));
     forcingTerm2 = op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1forcing2(prevCrv, preva1, k1, x)));
     forcingTerm=sparse([forcingTerm1; forcingTerm2]);
-    %Q: negatie or postivie terms in lambdaFuncs
+    %Q: negatie or postivie terms in lambda Funcs?
     lambdaTerm1=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc1(prevCrv, x)));
     lambdaTerm2=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc2(prevCrv, x)));
     incompleteRHS=(Mblock + Bblock)*prevCrvCoefs + forcingTerm;
-    
+   
+    %Q: whats a good inital interval?
+    %Q: what do you mean by lambda^(m+1) in the scheme?
     % Bisection method on f(lambda)=|approxArea-actualArea| on [a, b]
     a=-10;
     b=10;
@@ -162,6 +165,7 @@ for step=1:steps
     a1Source=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1a1Source(preva1, preva2, preva3, gamma, r1, s, s1, s3, b1, x)));
     a3Source=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1a3Source(preva1, preva3, gamma, r3, b3, x )));
     % Q: use prevCrv or newCrv here?
+    % Q: is it okay to approximate u_t like that in the advection field?
     redistTerm = op_vel_dot_gradu_v_tp_param(newSpace, newSpace, newMsh, @(x)(cellMotilityAttempt1AdvectionField(prevCrv, newCrv, delta, x)));
     
     % % Update a1
@@ -192,7 +196,7 @@ end
 % % Print Cell shapes
 hold on;
 title('Cell membrane');
-for i=1:50:steps
+for i=1:1:steps
     crv=perbspmak([xCoefsStore(:,i)'; yCoefsStore(:,i)'], knots);
     perbspplot(crv, 80);
 end
@@ -201,7 +205,7 @@ end
 figure;
 hold on;
 title('a1 values');
-for i=1:50:steps
+for i=1:1:steps
     crv=perbspmak(a1CoefsStore(:,i)', knots);
     perbspplot(crv, 1);
 end
@@ -210,7 +214,7 @@ end
 figure;
 hold on;
 title('a3 values');
-for i=1:50:steps
+for i=1:1:steps
     crv=perbspmak(a3CoefsStore(:,i)', knots);
     perbspplot(crv, 1);
 end
