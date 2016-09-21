@@ -1,0 +1,16 @@
+<?xml version="1.0"?> 
+<VTKFile type="StructuredGrid" version="0.1"> 
+<StructuredGrid WholeExtent="0 19 0 0 0 0"> 
+<Piece Extent="0 19 0 0 0 0"> 
+<PointData>
+<DataArray type="Float32" Name="u" format="ascii" NumberOfComponents="1"> 
+0.93406 0.634256 0.276053 -0.0083886 -0.15567 -0.189733 -0.0980664 0.12156 0.44701 0.818296 1.1817 1.55299 1.87844 2.09807 2.18973 2.15567 2.00839 1.72395 1.36574 1.06594 </DataArray> 
+</PointData> 
+<Points> 
+<DataArray type="Float32" NumberOfComponents="3"> 
+1 0 0 0.950898 0 0 0.793182 0 0 0.538157 0 0 0.230959 0 0 -0.0754898 0 0 -0.38749 0 0 -0.675619 0 0 -0.885826 0 0 -0.988273 0 0 -0.988273 0 0 -0.885826 0 0 -0.675619 0 0 -0.38749 0 0 -0.0754898 0 0 0.230959 0 0 0.538157 0 0 0.793182 0 0 0.950898 0 0 1 0 0 
+</DataArray>
+</Points> 
+</Piece> 
+</StructuredGrid> 
+</VTKFile> 

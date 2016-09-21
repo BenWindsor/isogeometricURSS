@@ -6,7 +6,7 @@
 xHandle=@(x)(cos(2*pi*x));
 yHandle=@(x)(sin(2*pi*x));
 degree=2;
-elemNum=23;
+elemNum=63;
 
 % Create surface and load geometry
 crv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -88,7 +88,7 @@ for i=1:numel(delta)
 end
 
 
-sp=linspace(0,1,50);
+sp=linspace(0,1,300);
 xActual=sqrt(1-2*delta(1))*cos(2*pi*sp);
 yActual=sqrt(1-2*delta(1))*sin(2*pi*sp);
 plot(xActual, yActual);

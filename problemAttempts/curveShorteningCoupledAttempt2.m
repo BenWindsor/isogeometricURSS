@@ -4,8 +4,8 @@
 t=0;
 xHandle=@(x)((1+0.25*exp(-t))*cos(2*pi*x));
 yHandle=@(x)((1+0.25*exp(-t))*sin(2*pi*x));
-degree=2;
-elemNum=19;
+degree=1;
+elemNum=39;
 
 % Create initial geometry and test space 
 prevCrv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -17,11 +17,11 @@ prevMsh=msh_cartesian(knots, qn, qw, prevGeometry);
 prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set time step
-delta=0.1;
+delta=0.001;
 stepNum=5;
 
 % Setup initial field values
-initialField=periodicCurveInterpolate(elemNum, 2, @(x)(0.8));
+initialField=periodicCurveInterpolate(elemNum, degree, @(x)(0.8));
 prevFieldCoefs=initialField.coefs';
 sourceTerm=@(x)(0);
 
