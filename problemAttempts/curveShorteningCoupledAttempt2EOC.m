@@ -107,7 +107,7 @@ for i=1:numel(N)
     fieldResults=storedFieldCoefs(:,steps)';
     
     % Compare radii
-    solutionHandle=@(x)(sqrt(1-2*t));
+    solutionHandle=@(x)(1+0.25*exp(-t));
     approxHandle=@(x)(norm(periodicSplineCurveEval(knots, x, degree, crvResults)));
     crvErrors(i)=maxDiff(solutionHandle, approxHandle, sp);
     %perbspplot(perbspmak(results, knots), 40);

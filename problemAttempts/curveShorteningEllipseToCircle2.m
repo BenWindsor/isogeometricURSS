@@ -1,4 +1,5 @@
-% Test of lagrange multiplier 
+% Test of lagrange multiplier now fixing the approximation using the new
+% space
 
 % Set up initial surface
 radius=1;
@@ -39,7 +40,7 @@ prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set parameters delta=time step, alpha=mesh redist. coefficient
 delta=0.01;
-steps=160;
+steps=40;
 alpha=0.001;
 
 % Set up fields
@@ -92,48 +93,84 @@ for step=1:steps
     %forcingTerm2 = op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1forcing2(prevCrv, preva1, k1, x)));
     %forcingTerm=sparse([forcingTerm1; forcingTerm2]);
     %Q: negatie or postivie terms in lambda Funcs?
-    lambdaTerm1=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc1(prevCrv, x)));
-    lambdaTerm2=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc2(prevCrv, x)));
+    prevLambdaTerm1=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc1(prevCrv, x)));
+    prevLambdaTerm2=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc2(prevCrv, x)));
     incompleteRHS=(Mblock + Bblock)*prevCrvCoefs; % + forcingTerm;
-   
+    
     %Q: whats a good inital interval?
     %Q: what do you mean by lambda^(m+1) in the scheme?
     % Bisection method on f(lambda)=|approxArea-actualArea| on [a, b]
-    a=-10;
+    a=-100;
     b=10;
     recalculate=1;
     while recalculate==1
         %Solve with the lhs lambda
-        aLambdaTerm1 = a*lambdaTerm1;
-        aLlambdaTerm2 = a*lambdaTerm2;
+        aLambdaTerm1 = a*prevLambdaTerm1;
+        aLlambdaTerm2 = a*prevLambdaTerm2;
         aLambdaTerm=sparse([aLambdaTerm1; aLlambdaTerm2]);
         aCrvRhs = incompleteRHS + aLambdaTerm;
         aNewCrvCoefs=crvMat\aCrvRhs;
         % Calculate approx. area with new curve
-        approxArea=aLambdaTerm1'*aNewCrvCoefs(1:elemNum) + aLlambdaTerm2'*aNewCrvCoefs((elemNum+1):2*elemNum);
+        % Create the new space
+        newCrv=perbspmak([aNewCrvCoefs(1:elemNum)'; aNewCrvCoefs((elemNum+1):2*elemNum)'], knots);
+        newGeometry=geo_load(newCrv);
+        [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(newCrv.order));
+        newMsh=msh_cartesian(knots, qn, qw, newGeometry);
+        newSpace=sp_perbsp(newGeometry.perbspline, newMsh);
+        lambdaTerm1=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc1(newCrv, x)));
+        lambdaTerm2=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc2(newCrv, x)));
+        approxArea=lambdaTerm1'*aNewCrvCoefs(1:elemNum) + lambdaTerm2'*aNewCrvCoefs((elemNum+1):2*elemNum);
         aDiff=actualArea-approxArea;
         
         %Solve with the rhs lambda
-        bLambdaTerm1 = b*lambdaTerm1;
-        bLlambdaTerm2 = b*lambdaTerm2;
+        bLambdaTerm1 = b*prevLambdaTerm1;
+        bLlambdaTerm2 = b*prevLambdaTerm2;
         bLambdaTerm=sparse([bLambdaTerm1; bLlambdaTerm2]);
         bCrvRhs = incompleteRHS + bLambdaTerm;
         bNewCrvCoefs=crvMat\bCrvRhs;
         % Calculate approx. area with new curve
-        approxArea=bLambdaTerm1'*bNewCrvCoefs(1:elemNum) + bLlambdaTerm2'*bNewCrvCoefs((elemNum+1):2*elemNum);
+        % Create the new space
+        newCrv=perbspmak([bNewCrvCoefs(1:elemNum)'; bNewCrvCoefs((elemNum+1):2*elemNum)'], knots);
+        newGeometry=geo_load(newCrv);
+        [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(newCrv.order));
+        newMsh=msh_cartesian(knots, qn, qw, newGeometry);
+        newSpace=sp_perbsp(newGeometry.perbspline, newMsh);
+        lambdaTerm1=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc1(newCrv, x)));
+        lambdaTerm2=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc2(newCrv, x)));
+        approxArea=lambdaTerm1'*bNewCrvCoefs(1:elemNum) + lambdaTerm2'*bNewCrvCoefs((elemNum+1):2*elemNum);
         bDiff=actualArea-approxArea;
-
+        
         % Solve for mid lambda
         mid=(a+b)/2;
-        midLambdaTerm1 = mid*lambdaTerm1;
-        midLlambdaTerm2 = mid*lambdaTerm2;
+        midLambdaTerm1 = mid*prevLambdaTerm1;
+        midLlambdaTerm2 = mid*prevLambdaTerm2;
         midLambdaTerm=sparse([midLambdaTerm1; midLlambdaTerm2]);
         midCrvRhs = incompleteRHS + midLambdaTerm;
         midNewCrvCoefs=crvMat\midCrvRhs;
         % % Calculate approx. area with new curve
-        approxArea=midLambdaTerm1'*midNewCrvCoefs(1:elemNum) + midLlambdaTerm2'*midNewCrvCoefs((elemNum+1):2*elemNum);
+        % Create the new space
+        newCrv=perbspmak([midNewCrvCoefs(1:elemNum)'; midNewCrvCoefs((elemNum+1):2*elemNum)'], knots);
+        newGeometry=geo_load(newCrv);
+        [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(newCrv.order));
+        newMsh=msh_cartesian(knots, qn, qw, newGeometry);
+        newSpace=sp_perbsp(newGeometry.perbspline, newMsh);
+        lambdaTerm1=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc1(newCrv, x)));
+        lambdaTerm2=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc2(newCrv, x)));
+        approxArea=lambdaTerm1'*midNewCrvCoefs(1:elemNum) + lambdaTerm2'*midNewCrvCoefs((elemNum+1):2*elemNum);
         midDiff=actualArea-approxArea;
-        
+%         
+%         fprintf('\naDiff:');
+%         fprintf(num2str(aDiff));
+%         fprintf(' a:');
+%         fprintf(num2str(a));
+%         fprintf('\nbDiff:');
+%         fprintf(num2str(bDiff));
+%         fprintf(' b:');
+%         fprintf(num2str(b));
+%         fprintf('\nmidDiff:');
+%         fprintf(num2str(midDiff));
+%         fprintf(' mid:');
+%         fprintf(num2str(mid));
         % Test if its within tolerance
         if abs(midDiff)<=tolerance
             recalculate=0;

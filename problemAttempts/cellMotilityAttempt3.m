@@ -6,7 +6,7 @@ radius=1;
 xHandle=@(x)(radius*cos(2*pi*x));
 yHandle=@(x)(radius*sin(2*pi*x));
 degree=1;
-elemNum=59;
+elemNum=200;
 
 % Set up equation parameters
 actualArea=pi*radius*radius;
@@ -40,7 +40,7 @@ prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set parameters delta=time step, alpha=mesh redist. coefficient
 delta=0.00001;
-steps=500;
+steps=5000;
 alpha=0.001;
 
 % Set up fields
@@ -49,12 +49,12 @@ initiala1=periodicCurveInterpolate(elemNum, degree, @(x)(0.5));
 preva1Coefs=initiala1.coefs';
 % TEST
 % prevalCoefs=0.5*ones(elemNum,1);
-preva1Coefs(5)=0.9;
-preva1Coefs(6)=1.0;
-preva1Coefs(7)=1.4;
-preva1Coefs(8)=1.5;
-preva1Coefs(9)=1.4;
-preva1Coefs(10)=0.9;
+% preva1Coefs(5)=0.9;
+% preva1Coefs(6)=1.0;
+% preva1Coefs(7)=1.4;
+% preva1Coefs(8)=1.5;
+% preva1Coefs(9)=1.4;
+% preva1Coefs(10)=0.9;
 
 a1Vals=perbspeval(initiala1, knots); 
 preva2=mean(a1Vals);
@@ -147,7 +147,7 @@ end
 % % Print Cell shapes
 hold on;
 title('Cell membrane');
-for i=1:50:steps
+for i=1:10:steps
     crv=perbspmak([xCoefsStore(:,i)'; yCoefsStore(:,i)'], knots);
     perbspplot(crv, 80);
 end
@@ -156,7 +156,7 @@ end
 figure;
 hold on;
 title('a1 values');
-for i=1:50:steps
+for i=1:10:steps
     crv=perbspmak(a1CoefsStore(:,i)', knots);
     perbspplot(crv, 1);
 end
@@ -165,7 +165,7 @@ end
 figure;
 hold on;
 title('a3 values');
-for i=1:50:steps
+for i=1:10:steps
     crv=perbspmak(a3CoefsStore(:,i)', knots);
     perbspplot(crv, 1);
 end
