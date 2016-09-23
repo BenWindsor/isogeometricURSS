@@ -1,13 +1,14 @@
-% Same as attempt 1 but with updated biseciton method using new space
-% correctly
-% First attempt at cell motility simulation
+% Same as attempt 1 but using the alpha_{pen} instead of lambda lagrange
+% multiplier and producing a movie
+% N.B. Clear workspace if changing frame size etc. 
+clear Frms;
 
 % Set up initial surface
 radius=1;
 xHandle=@(x)(radius*cos(2*pi*x));
 yHandle=@(x)(radius*sin(2*pi*x));
 degree=1;
-elemNum=39;
+elemNum=139;
 
 % Set up equation parameters
 actualArea=pi*radius*radius;
@@ -22,7 +23,7 @@ s=0.0001;
 b1=0.1;
 b3=0.005;
 k1=1.4;
-tolerance=0.5; % Tolerance for lambda approx
+alpha_pen=100;
 
 % Create surface and load geometry
 prevCrv=periodicCurveInterpolate(elemNum, degree, xHandle, yHandle);
@@ -40,8 +41,8 @@ prevMsh=msh_cartesian(knots, qn, qw, prevGeometry);
 prevSpace=sp_perbsp(prevGeometry.perbspline, prevMsh);
 
 % Set parameters delta=time step, alpha=mesh redist. coefficient
-delta=0.005;
-steps=15;
+delta=0.0005;
+steps=1500;
 alpha=0.001;
 
 % Set up fields
@@ -50,16 +51,22 @@ initiala1=periodicCurveInterpolate(elemNum, degree, @(x)(0.5));
 preva1Coefs=initiala1.coefs';
 % TEST
 % prevalCoefs=0.5*ones(elemNum,1);
-preva1Coefs(5)=5.1;
-preva1Coefs(6)=5.1;
-preva1Coefs(7)=5.2;
-preva1Coefs(8)=5.5;
-preva1Coefs(9)=5.4;
-preva1Coefs(10)=5.3;
+% preva1Coefs(5)=1.1;
+% preva1Coefs(6)=1.2;
+% preva1Coefs(7)=1.6;
+% preva1Coefs(8)=1.8;
+% preva1Coefs(9)=2.0;
+% preva1Coefs(10)=2.4;
+% preva1Coefs(11)=2.6;
+% preva1Coefs(12)=3.0;
+% preva1Coefs(13)=2.6;
+% preva1Coefs(14)=2.4;
+% preva1Coefs(15)=1.8;
+% preva1Coefs(16)=1.3;
+% preva1Coefs(17)=0.9;
 
 a1Vals=perbspeval(initiala1, knots); 
 preva2=mean(a1Vals);
-%preva2=0.5;
 initiala3=periodicCurveInterpolate(elemNum, degree, @(x)(1.3));
 preva3Coefs=initiala3.coefs';
 
@@ -69,8 +76,22 @@ yCoefsStore=zeros(elemNum, steps);
 a1CoefsStore=zeros(elemNum, steps);
 a2Store=zeros(steps);
 a3CoefsStore=zeros(elemNum, steps);
-prevLambda=0;
 
+% initial visualisation
+movie_flag = 1;
+my_fig_hdl = figure;
+title('Cell membrane');
+crv=perbspmak(prevCrv.coefs, knots);
+perbspplot(crv, 120);
+axis([-4 4 -4 4]);
+fprintf('\nPaused: press enter to continue\n');
+pause
+if movie_flag == 1
+    Frms(1) = getframe(my_fig_hdl);
+    Frms(2) = getframe(my_fig_hdl);
+    movie_ct = 3;
+end
+clf;
 for step=1:steps
     disp(step);
     % Update cell surface
@@ -94,103 +115,14 @@ for step=1:steps
     forcingTerm1 = op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1forcing1(prevCrv, preva1, k1, x)));
     forcingTerm2 = op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1forcing2(prevCrv, preva1, k1, x)));
     forcingTerm=sparse([forcingTerm1; forcingTerm2]);
-    %Q: negatie or postivie terms in lambda Funcs?
+    % Use code from the lambda setup to calculate area, though no lambda
+    % is involved in this other than file names etc. 
     prevLambdaTerm1=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc1(prevCrv, x)));
     prevLambdaTerm2=op_f_v_tp_param(prevSpace, prevMsh, @(x)(cellMotilityAttempt1lambdaFunc2(prevCrv, x)));
-    incompleteRHS=(Mblock + Bblock)*prevCrvCoefs + forcingTerm;
-    
-    %Q: whats a good inital interval?
-    %Q: what do you mean by lambda^(m+1) in the scheme?
-    % Bisection method on f(lambda)=|approxArea-actualArea| on [a, b]
-    if step==1
-        a=-100;
-        b=50;
-    else
-        a=prevLambda-3*abs(prevLambda);
-        b=prevLambda+3*abs(prevLambda);
-    end
-    recalculate=1;
-    while recalculate==1
-        %Solve with the lhs lambda
-        aLambdaTerm1 = a*prevLambdaTerm1;
-        aLlambdaTerm2 = a*prevLambdaTerm2;
-        aLambdaTerm=sparse([aLambdaTerm1; aLlambdaTerm2]);
-        aCrvRhs = incompleteRHS + aLambdaTerm;
-        aNewCrvCoefs=crvMat\aCrvRhs;
-        % Calculate approx. area with new curve
-        % Create the new space
-        newCrv=perbspmak([aNewCrvCoefs(1:elemNum)'; aNewCrvCoefs((elemNum+1):2*elemNum)'], knots);
-        newGeometry=geo_load(newCrv);
-        [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(newCrv.order));
-        newMsh=msh_cartesian(knots, qn, qw, newGeometry);
-        newSpace=sp_perbsp(newGeometry.perbspline, newMsh);
-        lambdaTerm1=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc1(newCrv, x)));
-        lambdaTerm2=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc2(newCrv, x)));
-        approxArea=0.5*(lambdaTerm1'*aNewCrvCoefs(1:elemNum) + lambdaTerm2'*aNewCrvCoefs((elemNum+1):2*elemNum));
-        aDiff=actualArea-approxArea;
-        
-        %Solve with the rhs lambda
-        bLambdaTerm1 = b*prevLambdaTerm1;
-        bLlambdaTerm2 = b*prevLambdaTerm2;
-        bLambdaTerm=sparse([bLambdaTerm1; bLlambdaTerm2]);
-        bCrvRhs = incompleteRHS + bLambdaTerm;
-        bNewCrvCoefs=crvMat\bCrvRhs;
-        % Calculate approx. area with new curve
-        % Create the new space
-        newCrv=perbspmak([bNewCrvCoefs(1:elemNum)'; bNewCrvCoefs((elemNum+1):2*elemNum)'], knots);
-        newGeometry=geo_load(newCrv);
-        [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(newCrv.order));
-        newMsh=msh_cartesian(knots, qn, qw, newGeometry);
-        newSpace=sp_perbsp(newGeometry.perbspline, newMsh);
-        lambdaTerm1=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc1(newCrv, x)));
-        lambdaTerm2=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc2(newCrv, x)));
-        approxArea=0.5*(lambdaTerm1'*bNewCrvCoefs(1:elemNum) + lambdaTerm2'*bNewCrvCoefs((elemNum+1):2*elemNum));
-        bDiff=actualArea-approxArea;
-        
-        % Solve for mid lambda
-        mid=(a+b)/2;
-        midLambdaTerm1 = mid*prevLambdaTerm1;
-        midLlambdaTerm2 = mid*prevLambdaTerm2;
-        midLambdaTerm=sparse([midLambdaTerm1; midLlambdaTerm2]);
-        midCrvRhs = incompleteRHS + midLambdaTerm;
-        midNewCrvCoefs=crvMat\midCrvRhs;
-        % % Calculate approx. area with new curve
-        % Create the new space
-        newCrv=perbspmak([midNewCrvCoefs(1:elemNum)'; midNewCrvCoefs((elemNum+1):2*elemNum)'], knots);
-        newGeometry=geo_load(newCrv);
-        [qn, qw] = msh_set_quad_nodes(knots, msh_gauss_nodes(newCrv.order));
-        newMsh=msh_cartesian(knots, qn, qw, newGeometry);
-        newSpace=sp_perbsp(newGeometry.perbspline, newMsh);
-        lambdaTerm1=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc1(newCrv, x)));
-        lambdaTerm2=op_f_v_tp_param(newSpace, newMsh, @(x)(cellMotilityAttempt1lambdaFunc2(newCrv, x)));
-        approxArea=0.5*(lambdaTerm1'*midNewCrvCoefs(1:elemNum) + lambdaTerm2'*midNewCrvCoefs((elemNum+1):2*elemNum));
-        midDiff=actualArea-approxArea;
-%         
-        fprintf('\naDiff:');
-        fprintf(num2str(aDiff));
-        fprintf(' a:');
-        fprintf(num2str(a));
-        fprintf('\nbDiff:');
-        fprintf(num2str(bDiff));
-        fprintf(' b:');
-        fprintf(num2str(b));
-        fprintf('\nmidDiff:');
-        fprintf(num2str(midDiff));
-        fprintf(' mid:');
-        fprintf(num2str(mid));
-        % Test if its within tolerance
-        if abs(midDiff)<=tolerance
-            recalculate=0;
-            lambda=mid;
-            newCrvCoefs=midNewCrvCoefs;
-        else
-            if sign(midDiff)==sign(aDiff)
-                a=mid;
-            else
-                b=mid;
-            end
-        end             
-    end
+    approxArea=0.5*(prevLambdaTerm1'*prevCrvCoefs(1:elemNum) + prevLambdaTerm2'*prevCrvCoefs((elemNum+1):2*elemNum));
+    penaltyTerm=alpha_pen*(approxArea-actualArea)*[prevLambdaTerm1; prevLambdaTerm2];
+    crvRhs=(Mblock + Bblock)*prevCrvCoefs - penaltyTerm + forcingTerm;
+    newCrvCoefs=crvMat\crvRhs;
     
     % Create the new space
     xCoefsStore(:,step)=newCrvCoefs(1:elemNum); 
@@ -224,6 +156,17 @@ for step=1:steps
     a3mat = sparse((1/delta)*newM + redistTerm + D3*A);
     a3rhs=sparse(((1/delta)*prevM)*preva3Coefs + a3Source);
     a3CoefsStore(:,step)=a3mat\a3rhs;
+    title('Cell membrane');
+    crv=perbspmak([xCoefsStore(:,step)'; yCoefsStore(:,step)'], knots);
+    perbspplot(crv, 120);
+    axis([-4 4 -4 4]);
+    if movie_flag == 1
+         Frms(movie_ct) = getframe(my_fig_hdl);
+         movie_ct = movie_ct+1;
+         Frms(movie_ct) = getframe(my_fig_hdl);
+         movie_ct = movie_ct+1;
+    end
+    clf;
     
     % Update all the surface ctrl points
     prevCrvCoefs=newCrvCoefs;
@@ -233,23 +176,32 @@ for step=1:steps
     preva2=a2Store(step);
     preva3Coefs=a3CoefsStore(:,step);
     prevCrv=perbspmak([xCoefsStore(:,step)'; yCoefsStore(:,step)'], knots);
-    prevLambda=lambda;
+end
+
+if movie_flag == 1
+    %movie(Frms)
+    V=VideoWriter('cellMotilityMovie.mp4');
+    open(V);
+    writeVideo(V,Frms);
+    close(V);
+    %movie2avi(Frms,'cMA4.avi');
 end
 
 % Display results
 % % Print Cell shapes
+figure;
 hold on;
 title('Cell membrane');
-for i=1:1:steps
+for i=1:100:steps
     crv=perbspmak([xCoefsStore(:,i)'; yCoefsStore(:,i)'], knots);
     perbspplot(crv, 80);
 end
 
-% % Print a1 curves
+% Print a1 curves
 figure;
 hold on;
 title('a1 values');
-for i=1:1:steps
+for i=1:100:steps
     crv=perbspmak(a1CoefsStore(:,i)', knots);
     perbspplot(crv, 1);
 end
@@ -258,7 +210,7 @@ end
 figure;
 hold on;
 title('a3 values');
-for i=1:1:steps
+for i=1:100:steps
     crv=perbspmak(a3CoefsStore(:,i)', knots);
     perbspplot(crv, 1);
 end
