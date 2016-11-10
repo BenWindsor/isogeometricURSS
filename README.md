@@ -4,7 +4,7 @@ A repository for my code created as part of the URSS at Warwick in 2016
 ### Installation
 In order to install: 
 
-1) Cut the file geo_load.m from the downloaded code and replace the existing geoPDEs file with the same name, this should be locatedat '[your geoPDEs install]/inst/geometry/geo_load.m.
+1) Cut the file geo_load.m from the downloaded code and replace the existing geoPDEs file with the same name, this should be located at '[your geoPDEs install]/inst/geometry/geo_load.m'.
 
 2) Add the folder with the remaining isogeometricURSS code to your matlab path including files and subfolders and it should be ready to use.
 
