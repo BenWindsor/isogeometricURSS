@@ -58,6 +58,7 @@ if(numel(varargin)==1)
     ctrl=xCoords';
     
     perbsp=perbspmak(ctrl, U);
+    
 elseif (numel(varargin)==2)
      ux=zeros(elemNum,1); %+1 for the zero eval point
      uy=zeros(elemNum,1);

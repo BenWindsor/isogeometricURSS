@@ -1,5 +1,5 @@
-function val = periodicSplineCurveDerivEval( perbsp, u)
-% Returns the value of the derivative of the spline curve at point u 
+function val = periodicSplineCurveSecondDerivEval( perbsp, u)
+% Returns the value of the second derivative of the spline curve at point u 
 % INPUT:
 % perbsp = periodic spline curve
 % u = points to eval
@@ -22,8 +22,9 @@ val=zeros(numel(ctrl(:,1)), numel(u));
 elems=numel(U)-2*p-1;
 for i=1:numel(u)
     for j=1:elems
-        val(:,i) = val(:,i) + ctrl(:,j)*periodicSingleBasisDerivEval(U, u(i), j, p);
+        val(:,i) = val(:,i) + ctrl(:,j)*periodicSingleBasisSecondDerivEval(U, u(i), j, p);
     end
 end
 
 end
+

@@ -9,8 +9,17 @@ function dist = periodicOffset( U, a, b )
 startPoint=U(1);
 endPoint=U(end);
 
-if a>endPoint || b>endPoint || a<startPoint || b<startPoint
-    error('Point out of range');
+if a>endPoint
+    error('a too big');
+end
+if b>endPoint
+    error('b too big');
+end
+if a<startPoint
+    error('a too small');
+end
+if b<startPoint
+    error('b too small');
 end
 
 if a<=b
