@@ -26,5 +26,12 @@ New functionality:
 
 From here all operators in sp_scalar and msh operations can be called as usual.
 
+### Examples
+Many of the files have a [filename]Test.m file alongside them containing my own tests of that code which should be useful for examining functionality. 
+
+The code in /problemAttempts/ has my own use of this library. It was used to solve the equations in the paper 'Modelling cell motility and chemotaxis with evolving surface finite elements' DOI:10.1098/rsif.2012.0276 by Elliot et al. as such many examples of my own attempts feature problems like curve shortening flow and versions thereof with lagrange multipliers designed to keep the area enclosed constant. 
+
+Specific files to look at include:
+
 ### Whats missing
 I have yet to implement periodic basis splines of degree greater than 3, and there is also no analogue of the sp_vector space so those operations are not available in vector forms. 
