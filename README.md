@@ -24,14 +24,19 @@ New functionality:
 - op_f_v_tp_param = a version of op_f_v_tp that takes values in the parametric domain instead of on the curve/mesh
 - op_u_v_tp_param = a version of op_u_v_tp that takes values in the parametric domain instead of on the curve/mesh
 
-From here all operators in sp_scalar and msh operations can be called as usual.
+From here operators in sp_scalar and msh operations can be called as usual.
 
 ### Examples
 Many of the files have a [filename]Test.m file alongside them containing my own tests of that code which should be useful for examining functionality. 
 
 The code in /problemAttempts/ has my own use of this library. It was used to solve the equations in the paper 'Modelling cell motility and chemotaxis with evolving surface finite elements' DOI:10.1098/rsif.2012.0276 by Elliot et al. as such many examples of my own attempts feature problems like curve shortening flow and versions thereof with lagrange multipliers designed to keep the area enclosed constant. 
 
-Specific files to look at include:
+It is also worth examining Listing 1 of the expository paper 'A new design for the implementation of isogeometric analysis in Octave and Matlab: GeoPDEs 3.0' by R. Vazquez as this code is what my library aimed to replicate the structure of, just swapping out the nurbs specific function calls with my own function calls. In particular the analogues are:
+- call geo_load on a periodic spline object e.g. the output of periodicCurveInterpolate or perbspmak
+- geometry.nurbs.knots becomes geometry.perbspline.knots
+- sp nurbs(geometry.nurbs, msh) becomes sp_perbsp(geometry.perbspline, msh)
 
 ### Whats missing
 I have yet to implement periodic basis splines of degree greater than 3, and there is also no analogue of the sp_vector space so those operations are not available in vector forms. 
+I also have yet to implement any sophisticated forms of output so you CANT call things like sp_to_vtk for example. I do have a perbspplot function as an analogue of the nrbplot function.
+I have not worked with any boundary conditions yet, other than the periodic conditions and others intrinsic to the problem I was writing this for. 
